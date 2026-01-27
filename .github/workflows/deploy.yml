@@ -40,7 +40,9 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          PATH_PREFIX: /zephyrsolutions/
+          # Use "/" for custom domains (root), or "/zephyrsolutions/" for GitHub Pages subdirectory
+          # Set this to "/" if using a custom domain like zephyrsolutions.info
+          PATH_PREFIX: /
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
