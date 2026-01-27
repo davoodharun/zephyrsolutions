@@ -148,9 +148,23 @@
   function initSmoothScroll() {
     // Get base path from current location (e.g., "/zephyrsolutions" or "")
     const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html');
-    const basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
-    const isHomePage = currentPath === '/' || currentPath === basePath + '/' || currentPath === basePath + '/index.html' || currentPath.endsWith('/index.html');
+    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html' && p !== 'index');
+    let basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
+    
+    // More robust home page detection - handle various path formats
+    let normalizedPath = currentPath.replace(/\/index\.html$/, '').replace(/\/index$/, '');
+    if (!normalizedPath || normalizedPath === '') {
+      normalizedPath = '/';
+    }
+    // Normalize trailing slashes for comparison
+    const pathForComparison = normalizedPath.replace(/\/+$/, '') || '/';
+    const baseForComparison = basePath.replace(/\/+$/, '') || '';
+    
+    // Check if we're on the home page
+    // Home page is either "/" or matches the base path exactly
+    const isHomePage = pathForComparison === '/' || 
+                      (baseForComparison && pathForComparison === baseForComparison) ||
+                      (baseForComparison === '' && pathForComparison === '/');
     
     // Handle all navigation links
     document.querySelectorAll('.nav-link, a[href^="#"], a[href^="/#"]').forEach(anchor => {
@@ -159,10 +173,14 @@
         const originalHref = href;
         
         // Check if this is a regular page link (not an anchor)
+        // Regular page links don't start with # and don't contain #
         if (href && !href.startsWith('#') && !href.includes('#')) {
-          // Regular page link - let it navigate normally
+          // Regular page link (like /skills/) - let it navigate normally
+          // Don't prevent default, allow normal navigation
           return;
         }
+        
+        // If we get here, it's an anchor link - prevent default and handle it
         
         // Always prevent default for anchor links
         e.preventDefault();
@@ -176,7 +194,9 @@
         // Handle home link
         if (!hash || hash === '#home' || href === '/' || href === basePath + '/' || href === basePath) {
           if (!isHomePage) {
-            window.location.href = basePath + '/';
+            // Navigate to home page - use root for custom domain, or basePath for subdirectory
+            const homeUrl = basePath === '' ? '/' : (basePath.replace(/\/+$/, '') + '/');
+            window.location.href = homeUrl;
             return;
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -185,7 +205,11 @@
         
         // If we're not on the home page, navigate to home with hash
         if (!isHomePage) {
-          window.location.href = basePath + '/' + hash;
+          // Build the home URL with hash - ensure proper formatting
+          let homeUrl = basePath === '' ? '/' : (basePath.replace(/\/+$/, '') + '/');
+          // Remove trailing slash before adding hash to avoid double slash
+          homeUrl = homeUrl.replace(/\/+$/, '') || '/';
+          window.location.href = homeUrl + hash;
           return;
         }
         
@@ -216,40 +240,60 @@
       });
     });
     
-    // Handle hash on page load (if user navigates directly to /#section)
+    // Handle hash on page load (if user navigates directly to /#section or /zephyrsolutions/#section)
     if (window.location.hash) {
       const hash = window.location.hash;
-      setTimeout(() => {
-        const target = document.querySelector(hash);
-        if (target) {
-          // Get actual header height dynamically
-          const header = document.querySelector('header.site-header');
-          const headerHeight = header ? header.offsetHeight : 100;
-          
-          // Try to find the h2 title within the section for better positioning
-          const sectionTitle = target.querySelector('h2');
-          const scrollTarget = sectionTitle || target;
-          
-          const elementPosition = scrollTarget.getBoundingClientRect().top;
-          // Add extra padding to ensure title is fully visible below header
-          const extraPadding = 20;
-          const offsetPosition = elementPosition + window.pageYOffset - headerHeight - extraPadding;
-          
-          window.scrollTo({
-            top: Math.max(0, offsetPosition), // Ensure we don't scroll to negative position
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+      // Only handle if we're on the home page
+      const currentPath = window.location.pathname;
+      const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html' && p !== 'index');
+      const basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
+      let normalizedPath = currentPath.replace(/\/index\.html$/, '').replace(/\/index$/, '');
+      if (!normalizedPath || normalizedPath === '') {
+        normalizedPath = '/';
+      }
+      if (normalizedPath !== '/' && !normalizedPath.endsWith('/')) {
+        normalizedPath = normalizedPath + '/';
+      }
+      const normalizedBase = basePath || '/';
+      const isHomePage = normalizedPath === '/' || normalizedPath === normalizedBase || normalizedPath === normalizedBase + '/' || normalizedPath === normalizedBase + '//';
+      
+      if (isHomePage) {
+        setTimeout(() => {
+          const target = document.querySelector(hash);
+          if (target) {
+            // Get actual header height dynamically
+            const header = document.querySelector('header.site-header');
+            const headerHeight = header ? header.offsetHeight : 100;
+            
+            // Try to find the h2 title within the section for better positioning
+            const sectionTitle = target.querySelector('h2');
+            const scrollTarget = sectionTitle || target;
+            
+            const elementPosition = scrollTarget.getBoundingClientRect().top;
+            // Add extra padding to ensure title is fully visible below header
+            const extraPadding = 20;
+            const offsetPosition = elementPosition + window.pageYOffset - headerHeight - extraPadding;
+
+            window.scrollTo({
+              top: Math.max(0, offsetPosition), // Ensure we don't scroll to negative position
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      }
     }
   }
 
   // Update active nav link based on scroll position
   function updateActiveNav() {
     const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html');
+    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html' && p !== 'index');
     const basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
-    const isHomePage = currentPath === '/' || currentPath === basePath + '/' || currentPath === basePath + '/index.html' || currentPath.endsWith('/index.html');
+    
+    // More robust home page detection
+    const normalizedPath = currentPath.replace(/\/index\.html$/, '').replace(/\/$/, '') || '/';
+    const normalizedBase = basePath || '/';
+    const isHomePage = normalizedPath === '/' || normalizedPath === normalizedBase || normalizedPath === normalizedBase + '/';
     
     // Only update if we're on the home page
     if (!isHomePage) {
