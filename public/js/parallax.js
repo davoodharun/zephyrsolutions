@@ -158,7 +158,13 @@
         let href = this.getAttribute('href');
         const originalHref = href;
         
-        // Always prevent default for navigation links
+        // Check if this is a regular page link (not an anchor)
+        if (href && !href.startsWith('#') && !href.includes('#')) {
+          // Regular page link - let it navigate normally
+          return;
+        }
+        
+        // Always prevent default for anchor links
         e.preventDefault();
         
         // Extract hash from various formats: "/zephyrsolutions/#about", "/#about", "#about"

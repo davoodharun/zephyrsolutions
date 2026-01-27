@@ -37,10 +37,12 @@
                     <li>
                         {% if item.url == "/" or item.url == "/#home" %}
                             <a href="{{ '/' | base }}" class="nav-link" data-section="home">{{ item.label }}</a>
-                        {% else %}
+                        {% elif "#" in item.url %}
                             {% set sectionId = item.url | replace('/#', '') | replace('#', '') | replace('/', '') %}
                             {% set anchorUrl = '#' + sectionId %}
                             <a href="{{ anchorUrl | base }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
+                        {% else %}
+                            <a href="{{ item.url | base }}" class="nav-link">{{ item.label }}</a>
                         {% endif %}
                     </li>
                     {% endfor %}
