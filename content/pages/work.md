@@ -15,14 +15,14 @@ Browse our case studies to see how we've helped organizations like yours achieve
       <article class="portfolio-card">
         {% if item.data.heroImage %}
           <div class="portfolio-card__image">
-            <a href="/work/{{ item.data.slug }}/">
-              <img src="{{ item.data.heroImage }}" alt="{{ item.data.heroImageAlt | default(item.data.title) }}" loading="lazy">
+            <a href="{{ basePath }}work/{{ item.data.slug }}/">
+              <img src="{{ item.data.heroImage | base }}" alt="{{ item.data.heroImageAlt | default(item.data.title) }}" loading="lazy">
             </a>
           </div>
         {% endif %}
         <div class="portfolio-card__content">
           <h2 class="portfolio-card__title">
-            <a href="/work/{{ item.data.slug }}/">{{ item.data.title }}</a>
+            <a href="{{ '/work/' | base }}{{ item.data.slug }}/">{{ item.data.title }}</a>
           </h2>
           {% if item.data.summary %}
             <p class="portfolio-card__summary">{{ item.data.summary }}</p>
@@ -45,7 +45,7 @@ Browse our case studies to see how we've helped organizations like yours achieve
               {% endif %}
             </div>
           {% endif %}
-          <a href="/work/{{ item.data.slug }}/" class="portfolio-card__link">Read Case Study →</a>
+          <a href="{{ '/work/' | base }}{{ item.data.slug }}/" class="portfolio-card__link">Read Case Study →</a>
         </div>
       </article>
     {% endfor %}

@@ -1,6 +1,22 @@
 const Image = require("@11ty/eleventy-img");
 
 module.exports = function(eleventyConfig) {
+  // Get pathPrefix from environment variable (for GitHub Pages) or default to "/"
+  // Normalize to ensure it's always a URL path starting with "/"
+  let pathPrefix = process.env.PATH_PREFIX || "/";
+  // If it looks like a Windows path, extract just the repository name
+  if (pathPrefix.includes(":") || pathPrefix.includes("\\")) {
+    // Extract repository name from path (e.g., "C:/path/to/zephyrsolutions/" -> "/zephyrsolutions/")
+    const match = pathPrefix.match(/([^\/\\]+)[\/\\]*$/);
+    pathPrefix = match ? `/${match[1]}/` : "/";
+  }
+  // Ensure it starts with / and ends with /
+  if (!pathPrefix.startsWith("/")) {
+    pathPrefix = `/${pathPrefix}`;
+  }
+  if (pathPrefix !== "/" && !pathPrefix.endsWith("/")) {
+    pathPrefix = `${pathPrefix}/`;
+  }
   // Copy static assets
   // Copy CSS directory to root of output
   eleventyConfig.addPassthroughCopy({
@@ -37,15 +53,21 @@ module.exports = function(eleventyConfig) {
     return {};
   });
 
+  // Add basePath as global data (use the normalized pathPrefix)
+  eleventyConfig.addGlobalData("basePath", pathPrefix);
+
   // Image optimization shortcode
   eleventyConfig.addAsyncShortcode("image", async function(src, alt, widths = [400, 800, 1200]) {
     if (!src) return "";
+    
+    // Get pathPrefix from environment or default to "/"
+    const pathPrefix = process.env.PATH_PREFIX || "/";
     
     let metadata = await Image(src, {
       widths: widths,
       formats: ["webp", "jpeg"],
       outputDir: "_site/images/",
-      urlPath: "/images/",
+      urlPath: `${pathPrefix}images/`,
     });
 
     let imageAttributes = {
@@ -85,7 +107,24 @@ module.exports = function(eleventyConfig) {
     return array.slice(0, limit || array.length);
   });
 
+  // Add pathPrefix filter to prefix URLs with the base path
+  eleventyConfig.addFilter("base", function(url) {
+    if (!url) return "";
+    // Don't modify external URLs, anchors, or mailto links
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("#") || url.startsWith("mailto:")) {
+      return url;
+    }
+    // If pathPrefix is "/", return the URL as-is (with leading slash)
+    if (pathPrefix === "/") {
+      return url.startsWith("/") ? url : `/${url}`;
+    }
+    // Otherwise, ensure URL doesn't start with / and combine with pathPrefix
+    const cleanUrl = url.startsWith("/") ? url.substring(1) : url;
+    return `${pathPrefix}${cleanUrl}`;
+  });
+
   // Return configuration object
+  
   return {
     dir: {
       input: ".",  // Process from root to include both src/ and content/
@@ -96,6 +135,6 @@ module.exports = function(eleventyConfig) {
     templateFormats: ["njk", "md", "html"],
     markdownTemplateEngine: "njk",
     htmlTemplateEngine: "njk",
-    pathPrefix: "/"
+    pathPrefix: pathPrefix
   };
 };

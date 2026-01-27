@@ -10,14 +10,14 @@ permalink: /
   <div class="parallax-bg hero-bg"></div>
   <div class="hero-content">
     <div class="hero-logo">
-      <img src="/images/zephyr-solutions-logo.png" alt="Zephyr Solutions Logo" class="hero-logo-image">
+      <img src="{{ '/images/zephyr-solutions-logo.png' | base }}" alt="Zephyr Solutions Logo" class="hero-logo-image">
     </div>
     <p class="hero-subtitle">Making technology work for smaller organizations and non-profits</p>
     <p class="hero-description">We help organizations navigate technology challenges without the complexity. Think of us as your friendly tech partner who speaks your language—no confusing jargon, just practical solutions.</p>
     <a href="#services" class="button hero-cta">See How We Can Help</a>
   </div>
   <div class="parallax-fg hero-illustration">
-    <img src="/images/hero-illustration.png" alt="Technology innovation" class="hero-illustration-image">
+    <img src="{{ '/images/hero-illustration.png' | base }}" alt="Technology innovation" class="hero-illustration-image">
   </div>
 </section>
 
@@ -33,7 +33,7 @@ permalink: /
       </div>
       <div class="column-right parallax-mid">
         <div class="illustration-card">
-          <img src="/images/about-illustration.png" alt="Friendly tech support - people working together" class="illustration-image">
+          <img src="{{ '/images/about-illustration.png' | base }}" alt="Friendly tech support - people working together" class="illustration-image">
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ permalink: /
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="/images/services/strategy-background.png" alt="IT Strategy & Planning" class="illustration-image">
+            <img src="{{ '/images/services/strategy-background.png' | base }}" alt="IT Strategy & Planning" class="illustration-image">
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ permalink: /
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="/images/services/implementation-background.png" alt="Technology Implementation" class="illustration-image">
+            <img src="{{ '/images/services/implementation-background.png' | base }}" alt="Technology Implementation" class="illustration-image">
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ permalink: /
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="/images/services/integration-background.png" alt="System Integration" class="illustration-image">
+            <img src="{{ '/images/services/integration-background.png' | base }}" alt="System Integration" class="illustration-image">
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@ permalink: /
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="/images/services/support-background.png" alt="Ongoing Support" class="illustration-image">
+            <img src="{{ '/images/services/support-background.png' | base }}" alt="Ongoing Support" class="illustration-image">
           </div>
         </div>
       </div>
@@ -141,12 +141,12 @@ permalink: /
                 {% endif %}
               </div>
             {% endif %}
-            <a href="{{ item.data.permalink }}" class="button" aria-label="Read case study: {{ item.data.title }}">Read Case Study →</a>
+            <a href="{{ item.data.permalink | base }}" class="button" aria-label="Read case study: {{ item.data.title }}">Read Case Study →</a>
           </div>
           <div class="column-right parallax-mid">
             <div class="illustration-card">
               {% if item.data.heroImage %}
-                <img src="{{ item.data.heroImage }}" alt="{{ item.data.heroImageAlt | default(item.data.title) }}" class="illustration-image" loading="lazy">
+                <img src="{{ item.data.heroImage | base }}" alt="{{ item.data.heroImageAlt | default(item.data.title) }}" class="illustration-image" loading="lazy">
               {% endif %}
             </div>
           </div>
@@ -170,7 +170,7 @@ permalink: /
         <p>Have a question? Not sure where to start? That's totally fine! We're happy to have a friendly conversation about what you're working with and how we might be able to help.</p>
       </div>
       <div class="contact-illustration parallax-fg">
-        <img src="/images/contact-illustration.png" alt="Get in touch - friendly communication" class="contact-image">
+        <img src="{{ '/images/contact-illustration.png' | base }}" alt="Get in touch - friendly communication" class="contact-image">
       </div>
     </div>
     

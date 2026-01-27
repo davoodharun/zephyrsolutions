@@ -5,7 +5,7 @@ layout: layouts/base
 <article class="portfolio-detail">
   {% if heroImage %}
     <div class="portfolio-detail__hero">
-      <img src="{{ heroImage }}" alt="{{ heroImageAlt | default(title) }}" class="portfolio-detail__hero-image">
+      <img src="{{ heroImage | base }}" alt="{{ heroImageAlt | default(title) }}" class="portfolio-detail__hero-image">
     </div>
   {% endif %}
 
@@ -51,6 +51,6 @@ layout: layouts/base
   </div>
 
   <nav class="portfolio-detail__navigation">
-    <a href="/work/" class="portfolio-detail__back-link">← Back to Portfolio</a>
+    <a href="{{ '/work/' | base }}" class="portfolio-detail__back-link">← Back to Portfolio</a>
   </nav>
 </article>

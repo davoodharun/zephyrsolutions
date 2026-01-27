@@ -9,7 +9,7 @@
     {% else %}
     <meta name="description" content="{{ site.defaultDescription }}">
     {% endif %}
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="{{ '/css/style.css' | base }}">
 </head>
 <body class="no-js">
     <header class="site-header">
@@ -17,7 +17,7 @@
             <div class="header-top">
                 <div class="header-brand">
                     {% if page.url == "/" %}
-                    <img src="/images/logo.png" alt="Zephyr Solutions Logo" class="site-logo" width="40" height="40">
+                    <img src="{{ '/images/logo.png' | base }}" alt="Zephyr Solutions Logo" class="site-logo" width="40" height="40">
                     {% endif %}
                     <h1 class="site-name">{{ globalSettings.siteName | default(site.siteName) }}</h1>
                 </div>
@@ -36,10 +36,10 @@
                     {% for item in navItems | sort(attribute="order") %}
                     <li>
                         {% if item.url == "/" or item.url == "/#home" %}
-                            <a href="/" class="nav-link" data-section="home">{{ item.label }}</a>
+                            <a href="{{ '/' | base }}" class="nav-link" data-section="home">{{ item.label }}</a>
                         {% else %}
                             {% set sectionId = item.url | replace('/#', '') | replace('#', '') | replace('/', '') %}
-                            <a href="/#{{ sectionId }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
+                            <a href="{{ '/#' | base }}{{ sectionId }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
                         {% endif %}
                     </li>
                     {% endfor %}
@@ -90,6 +90,6 @@
       // Remove no-js class when JavaScript is enabled
       document.body.classList.remove('no-js');
     </script>
-    <script src="/js/parallax.js" defer></script>
+    <script src="{{ '/js/parallax.js' | base }}" defer></script>
 </body>
 </html>
