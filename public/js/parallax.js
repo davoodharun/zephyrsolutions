@@ -146,6 +146,12 @@
 
   // Smooth scroll for anchor links
   function initSmoothScroll() {
+    // Get base path from current location (e.g., "/zephyrsolutions" or "")
+    const currentPath = window.location.pathname;
+    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html');
+    const basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
+    const isHomePage = currentPath === '/' || currentPath === basePath + '/' || currentPath === basePath + '/index.html' || currentPath.endsWith('/index.html');
+    
     // Handle all navigation links
     document.querySelectorAll('.nav-link, a[href^="#"], a[href^="/#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
@@ -155,16 +161,16 @@
         // Always prevent default for navigation links
         e.preventDefault();
         
-        // Handle links like "/#about" - extract just the hash
-        if (href.startsWith('/#')) {
-          href = href.substring(1); // Remove leading "/" to get "#about"
+        // Extract hash from various formats: "/zephyrsolutions/#about", "/#about", "#about"
+        let hash = '';
+        if (href.includes('#')) {
+          hash = '#' + href.split('#')[1];
         }
         
         // Handle home link
-        if (href === '/' || href === '#' || href === '#home') {
-          // If not on home page, navigate to home first
-          if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-            window.location.href = '/';
+        if (!hash || hash === '#home' || href === '/' || href === basePath + '/' || href === basePath) {
+          if (!isHomePage) {
+            window.location.href = basePath + '/';
             return;
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -172,14 +178,13 @@
         }
         
         // If we're not on the home page, navigate to home with hash
-        if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-          // Navigate to home page with hash, which will trigger scroll on load
-          window.location.href = originalHref.startsWith('/#') ? originalHref : `/#${href.substring(1)}`;
+        if (!isHomePage) {
+          window.location.href = basePath + '/' + hash;
           return;
         }
         
         // We're on the home page, scroll to section
-        const target = document.querySelector(href);
+        const target = document.querySelector(hash);
         if (target) {
           // Get actual header height dynamically
           const header = document.querySelector('header.site-header');
@@ -200,7 +205,7 @@
           });
         } else {
           // If target not found, try navigating (fallback)
-          console.warn('Section not found:', href);
+          console.warn('Section not found:', hash);
         }
       });
     });
@@ -235,8 +240,13 @@
 
   // Update active nav link based on scroll position
   function updateActiveNav() {
+    const currentPath = window.location.pathname;
+    const pathParts = currentPath.split('/').filter(p => p && p !== 'index.html');
+    const basePath = pathParts.length > 0 && pathParts[0] !== '' ? '/' + pathParts[0] : '';
+    const isHomePage = currentPath === '/' || currentPath === basePath + '/' || currentPath === basePath + '/index.html' || currentPath.endsWith('/index.html');
+    
     // Only update if we're on the home page
-    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+    if (!isHomePage) {
       return;
     }
     
@@ -254,9 +264,11 @@
         navLinks.forEach(link => {
           link.classList.remove('active');
           const href = link.getAttribute('href');
-          // Match various href formats: /#about, #about, / (for home)
-          if ((href === `/#${sectionId}` || href === `#${sectionId}`) ||
-              (sectionId === 'home' && (href === '/' || href === '/#home' || href === '#home'))) {
+          // Extract hash from href (handles /zephyrsolutions/#about, /#about, #about)
+          const hash = href.includes('#') ? '#' + href.split('#')[1] : '';
+          // Match section ID with hash, or home section with various formats
+          if ((hash === `#${sectionId}`) ||
+              (sectionId === 'home' && (!hash || hash === '#home' || href.endsWith('/') || href === '/' || href === basePath + '/'))) {
             link.classList.add('active');
           }
         });
