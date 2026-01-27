@@ -112,6 +112,14 @@ module.exports = function(eleventyConfig) {
     if (!url) return "";
     // Don't modify external URLs or mailto links
     if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("mailto:")) {
+      // Convert protocol-relative URLs to HTTPS
+      if (url.startsWith("//")) {
+        return "https:" + url;
+      }
+      // Convert HTTP to HTTPS for external URLs
+      if (url.startsWith("http://")) {
+        return url.replace("http://", "https://");
+      }
       return url;
     }
     // Handle anchor links - prefix with basePath if not root

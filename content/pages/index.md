@@ -45,19 +45,19 @@ permalink: /
   <div class="parallax-bg services-bg"></div>
   <div class="container">
     <h2>What We Do</h2>
-    <p class="section-intro">Every organization is unique, and so are your technology needs. We offer services designed specifically for smaller teams and tighter budgets:</p>
+    <p class="section-intro">We specialize in web-based solutions and automation. Starting as a full-stack engineer, we've expanded to handle everything from cloud infrastructure to SaaS migrations. Here's what we can help you with:</p>
     
     <div class="service-item">
       <div class="two-column-content">
         <div class="column-left">
-          <h3>IT Strategy & Planning</h3>
-          <p>We help you figure out what technology you actually need (and what you don't) so you can make smart decisions without breaking the bank.</p>
-          <p>Technology can feel overwhelming when you're trying to run an organization. There are so many options, and it's hard to know what's essential versus what's just nice to have. We sit down with you to understand your goals, your budget, and your team's needs. Then we create a clear, practical plan that helps you move forward without getting stuck in analysis paralysis.</p>
-          <p>Whether you're starting from scratch or trying to make sense of what you already have, we'll help you build a technology roadmap that actually makes sense for your organization.</p>
+          <h3>Web Development & Applications</h3>
+          <p>Full-stack web development is where we started, and it's still at the core of what we do. We build modern web applications, websites, and web-based tools that work well and are easy to maintain.</p>
+          <p>Whether you need a new website, a web application for your team, or updates to an existing site, we handle both the front-end (what users see) and back-end (the systems that power it). We work with modern frameworks and tools to build solutions that are fast, secure, and scalable.</p>
+          <p>From simple brochure sites to complex web applications, we create web-based solutions that fit your needs and your budget.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/strategy-background.png' | base }}" alt="IT Strategy & Planning" class="illustration-image">
+            <img src="{{ '/images/services/strategy-background.png' | base }}" alt="Web Development & Applications" class="illustration-image">
           </div>
         </div>
       </div>
@@ -66,14 +66,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content two-column-content--reverse">
         <div class="column-left">
-          <h3>Technology Implementation</h3>
-          <p>When you're ready to upgrade or add new tools, we make sure everything works smoothly and your team knows how to use it.</p>
-          <p>Buying new software or hardware is one thing—getting it set up and actually working for your team is another. We handle the technical setup so you don't have to stress about configurations, integrations, or compatibility issues. We also make sure your team feels comfortable using the new tools, not just confused by them.</p>
-          <p>From cloud migrations to new software rollouts, we take care of the details so you can focus on what matters: using technology to make your work easier, not harder.</p>
+          <h3>Cloud Infrastructure & Automation</h3>
+          <p>We set up and manage cloud infrastructure, automate deployments, and create infrastructure-as-code solutions that make your systems more reliable and easier to manage.</p>
+          <p>Moving to the cloud or automating your infrastructure doesn't have to be overwhelming. We help you set up cloud services, configure automated deployments, and create scripts and templates that make managing your infrastructure straightforward. This means less manual work, fewer errors, and systems that are easier to update and maintain.</p>
+          <p>Whether you're moving to Azure, setting up CI/CD pipelines, or automating routine tasks, we make cloud infrastructure work for you instead of the other way around.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/implementation-background.png' | base }}" alt="Technology Implementation" class="illustration-image">
+            <img src="{{ '/images/services/implementation-background.png' | base }}" alt="Cloud Infrastructure & Automation" class="illustration-image">
           </div>
         </div>
       </div>
@@ -82,14 +82,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content">
         <div class="column-left">
-          <h3>System Integration</h3>
-          <p>Got different systems that don't talk to each other? We help them work together so you spend less time switching between tools.</p>
-          <p>You probably use multiple tools for different parts of your work—maybe one for email, another for project management, and something else for customer data. When these systems don't connect, you end up doing the same work in multiple places, which wastes time and increases the chance of errors.</p>
-          <p>We help your tools work together seamlessly. Whether that means connecting your CRM to your email system, syncing data between platforms, or automating repetitive tasks, we make sure your technology stack works as a team, not as a collection of disconnected pieces.</p>
+          <h3>SaaS Setup & On-Prem Migrations</h3>
+          <p>We help you set up web-based SaaS services and migrate from on-premises systems to cloud-based solutions.</p>
+          <p>If you're using software that runs on servers in your office (on-premises), moving to web-based services can save time, reduce maintenance, and give you more flexibility. We help you evaluate options, plan the migration, and handle the technical work of moving your data and processes to new systems.</p>
+          <p>We also help you set up and configure SaaS tools—from project management platforms to customer relationship systems—so they work the way you need them to. The goal is to get you using modern, web-based tools without the headache of managing servers or dealing with outdated software.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/integration-background.png' | base }}" alt="System Integration" class="illustration-image">
+            <img src="{{ '/images/services/integration-background.png' | base }}" alt="SaaS Setup & On-Prem Migrations" class="illustration-image">
           </div>
         </div>
       </div>
@@ -98,14 +98,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content two-column-content--reverse">
         <div class="column-left">
-          <h3>Ongoing Support</h3>
-          <p>Technology issues shouldn't derail your day. We're here when you need help, with support that's actually helpful and easy to understand.</p>
-          <p>Things break, questions come up, and sometimes you just need someone who can explain what's happening in plain English. That's where we come in. We offer ongoing support that's responsive, practical, and free of technical jargon.</p>
-          <p>Whether it's a quick question about how to do something, troubleshooting a problem, or helping your team learn new features, we're here to help. You don't need to be a tech expert to get things done—you just need someone who can translate technology into solutions that make sense for your work.</p>
+          <h3>Automation & Scripting</h3>
+          <p>We automate repetitive tasks and create scripts that save you time and reduce errors.</p>
+          <p>If you find yourself doing the same tasks over and over—moving data between systems, generating reports, updating files, or running routine maintenance—we can automate those processes. We write scripts and set up workflows that handle these tasks automatically, so you can focus on the work that actually needs your attention.</p>
+          <p>Whether it's automating form submissions, syncing data between platforms, or creating custom scripts for your specific needs, we help you work smarter, not harder. The result is less manual work, fewer mistakes, and more time for the things that matter.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/support-background.png' | base }}" alt="Ongoing Support" class="illustration-image">
+            <img src="{{ '/images/services/support-background.png' | base }}" alt="Automation & Scripting" class="illustration-image">
           </div>
         </div>
       </div>
