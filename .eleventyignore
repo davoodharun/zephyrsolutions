@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.specify/
+specs/
+.cursor/
+*.log
+.env*
+README.md
+**/README.md
+tina/
+docs/
+public/images/**/README.md

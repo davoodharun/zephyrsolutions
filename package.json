@@ -1,0 +1,23 @@
+{
+  "name": "zephyr-solutions-website",
+  "version": "0.1.0",
+  "description": "Company brochure website for Zephyr Solutions - IT consulting firm",
+  "scripts": {
+    "dev": "eleventy --serve --watch",
+    "build": "eleventy"
+  },
+  "keywords": [
+    "eleventy",
+    "static-site",
+    "brochure"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.0",
+    "@11ty/eleventy-img": "^6.0.4",
+    "@tinacms/cli": "^2.1.2",
+    "@tinacms/datalayer": "^2.0.7",
+    "tinacms": "^3.3.2"
+  }
+}

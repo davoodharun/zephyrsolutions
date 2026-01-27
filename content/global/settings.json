@@ -1,0 +1,25 @@
+{
+  "siteName": "Zephyr Solutions",
+  "primaryDomain": "https://zephyrsolutions.com",
+  "defaultSEO": {
+    "title": "{{title}} - Zephyr Solutions",
+    "description": "IT Consulting for Smaller Organizations and Non-Profits",
+    "ogImage": "/images/og-default.jpg"
+  },
+  "navigation": {
+    "header": [
+      { "label": "Home", "url": "/#home", "order": 1 },
+      { "label": "About", "url": "/#about", "order": 2 },
+      { "label": "Services", "url": "/#services", "order": 3 },
+      { "label": "Work", "url": "/#work", "order": 4 },
+      { "label": "Contact", "url": "/#contact", "order": 5 }
+    ]
+  },
+  "social": {
+    "linkedin": "https://linkedin.com/company/zephyr-solutions"
+  },
+  "contact": {
+    "email": "info@zephyrsolutions.com",
+    "phone": "+1-555-0123"
+  }
+}

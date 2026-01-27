@@ -1,0 +1,38 @@
+﻿# zephyrsolutions Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-01-26
+
+## Active Technologies
+- CSS3, HTML5 (web standards) + None (pure CSS/HTML, no additional libraries required) (002-modern-styling)
+- N/A (styling only, no data storage) (002-modern-styling)
+- Node.js (LTS 18.x/20.x), TypeScript (for TinaCMS config if needed) + Eleventy (11ty) static site generator, TinaCMS (Git-backed CMS), image optimization libraries (sharp or similar), Node.js package manager (003-full-site-implementation)
+- File-based (Markdown/JSON/YAML content files, image assets in repository or media strategy) (003-full-site-implementation)
+- Node.js (LTS 18.x/20.x), CSS3, JavaScript (ES6+ for progressive enhancement) + Eleventy (11ty) static site generator (existing), CSS for styling, minimal JavaScript for parallax effects (requestAnimationFrame, Intersection Observer), no additional frameworks required (001-site-redesign)
+- File-based (existing Markdown/JSON/YAML content files, CSS files) (001-site-redesign)
+
+- Node.js (LTS version, typically 18.x or 20.x) + Eleventy (11ty) static site generator, Node.js package manager (npm/pnpm/yarn) (001-website-scaffold)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+# Add commands for Node.js (LTS version, typically 18.x or 20.x)
+
+## Code Style
+
+Node.js (LTS version, typically 18.x or 20.x): Follow standard conventions
+
+## Recent Changes
+- 001-site-redesign: Added Node.js (LTS 18.x/20.x), CSS3, JavaScript (ES6+ for progressive enhancement) + Eleventy (11ty) static site generator (existing), CSS for styling, minimal JavaScript for parallax effects (requestAnimationFrame, Intersection Observer), no additional frameworks required
+- 003-full-site-implementation: Added Node.js (LTS 18.x/20.x), TypeScript (for TinaCMS config if needed) + Eleventy (11ty) static site generator, TinaCMS (Git-backed CMS), image optimization libraries (sharp or similar), Node.js package manager
+- 002-modern-styling: Added CSS3, HTML5 (web standards) + None (pure CSS/HTML, no additional libraries required)
+
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

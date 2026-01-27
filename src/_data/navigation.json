@@ -1,0 +1,9 @@
+{
+  "header": [
+    { "label": "Home", "url": "/#home", "order": 1 },
+    { "label": "About", "url": "/#about", "order": 2 },
+    { "label": "Services", "url": "/#services", "order": 3 },
+    { "label": "Work", "url": "/#work", "order": 4 },
+    { "label": "Contact", "url": "/#contact", "order": 5 }
+  ]
+}

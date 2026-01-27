@@ -1,0 +1,56 @@
+---
+layout: layouts/base
+---
+
+<article class="portfolio-detail">
+  {% if heroImage %}
+    <div class="portfolio-detail__hero">
+      <img src="{{ heroImage }}" alt="{{ heroImageAlt | default(title) }}" class="portfolio-detail__hero-image">
+    </div>
+  {% endif %}
+
+  <header class="portfolio-detail__header">
+    <h1 class="portfolio-detail__title">{{ title }}</h1>
+    {% if client %}
+      <p class="portfolio-detail__client">Client: {{ client }}</p>
+    {% endif %}
+    {% if date %}
+      <time class="portfolio-detail__date" datetime="{{ date }}">{{ date | date }}</time>
+    {% endif %}
+  </header>
+
+  {% if industries or servicesUsed %}
+    <div class="portfolio-detail__meta">
+      {% if industries %}
+        <div class="portfolio-detail__tags">
+          <strong>Industries:</strong>
+          {% for industry in industries %}
+            <span class="tag tag--industry">{{ industry }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if servicesUsed %}
+        <div class="portfolio-detail__tags">
+          <strong>Services:</strong>
+          {% for service in servicesUsed %}
+            <span class="tag tag--service">{{ service }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if summary %}
+    <div class="portfolio-detail__summary">
+      <p class="lead">{{ summary }}</p>
+    </div>
+  {% endif %}
+
+  <div class="portfolio-detail__content">
+    {{ content | safe }}
+  </div>
+
+  <nav class="portfolio-detail__navigation">
+    <a href="/work/" class="portfolio-detail__back-link">← Back to Portfolio</a>
+  </nav>
+</article>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} - {% endif %}{{ globalSettings.siteName | default(site.siteName) }}</title>
+    {% if description %}
+    <meta name="description" content="{{ description }}">
+    {% else %}
+    <meta name="description" content="{{ site.defaultDescription }}">
+    {% endif %}
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="no-js">
+    <header class="site-header">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-brand">
+                    {% if page.url == "/" %}
+                    <img src="/images/logo.png" alt="Zephyr Solutions Logo" class="site-logo" width="40" height="40">
+                    {% endif %}
+                    <h1 class="site-name">{{ globalSettings.siteName | default(site.siteName) }}</h1>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+            </div>
+            {% if site.tagline %}
+            <p class="tagline">{{ site.tagline }}</p>
+            {% endif %}
+            <nav aria-label="Main navigation" class="main-nav" id="main-nav">
+                <ul class="nav-list">
+                    {% set navItems = globalSettings.navigation.header | default(navigation.header) %}
+                    {% for item in navItems | sort(attribute="order") %}
+                    <li>
+                        {% if item.url == "/" or item.url == "/#home" %}
+                            <a href="/" class="nav-link" data-section="home">{{ item.label }}</a>
+                        {% else %}
+                            {% set sectionId = item.url | replace('/#', '') | replace('#', '') | replace('/', '') %}
+                            <a href="/#{{ sectionId }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        {% if page.url == "/" %}
+            {{ content | safe }}
+        {% else %}
+            <div class="container section">
+                {% if title %}
+                <h1>{{ title }}</h1>
+                {% endif %}
+                {% if sections %}
+                    {% for section in sections %}
+                        {% set config = section.config %}
+                        {% if section.type == "hero" %}
+                            {% include "components/sections/hero.njk" %}
+                        {% elif section.type == "feature-list" %}
+                            {% include "components/sections/feature-list.njk" %}
+                        {% elif section.type == "testimonials" %}
+                            {% include "components/sections/testimonials.njk" %}
+                        {% elif section.type == "two-column" %}
+                            {% include "components/sections/two-column.njk" %}
+                        {% elif section.type == "cta" %}
+                            {% include "components/sections/cta.njk" %}
+                        {% elif section.type == "faq" %}
+                            {% include "components/sections/faq.njk" %}
+                        {% elif section.type == "gallery" %}
+                            {% include "components/sections/gallery.njk" %}
+                        {% elif section.type == "stats" %}
+                            {% include "components/sections/stats.njk" %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {{ content | safe }}
+            </div>
+        {% endif %}
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; {{ "" | date("YYYY") }} {{ globalSettings.siteName | default(site.siteName) }}. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+      // Remove no-js class when JavaScript is enabled
+      document.body.classList.remove('no-js');
+    </script>
+    <script src="/js/parallax.js" defer></script>
+</body>
+</html>

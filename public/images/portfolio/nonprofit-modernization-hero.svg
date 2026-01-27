@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#f9fafb"/>
+  
+  <!-- Network/Cloud illustration -->
+  <g opacity="0.8">
+    <!-- Cloud shape -->
+    <path d="M300 400 Q250 350 200 400 Q150 450 200 500 Q250 550 300 500 Q350 550 400 500 Q450 550 500 500 Q550 450 500 400 Q450 350 400 400 Q350 350 300 400 Z" 
+          fill="#2563eb" stroke="#1e40af" stroke-width="2"/>
+    
+    <!-- Connected nodes -->
+    <circle cx="200" cy="300" r="30" fill="#1e3a5f"/>
+    <circle cx="400" cy="300" r="30" fill="#1e3a5f"/>
+    <circle cx="600" cy="300" r="30" fill="#1e3a5f"/>
+    <circle cx="300" cy="500" r="30" fill="#1e3a5f"/>
+    <circle cx="500" cy="500" r="30" fill="#1e3a5f"/>
+    
+    <!-- Connection lines -->
+    <line x1="200" y1="300" x2="300" y2="400" stroke="#2563eb" stroke-width="2"/>
+    <line x1="400" y1="300" x2="300" y2="400" stroke="#2563eb" stroke-width="2"/>
+    <line x1="400" y1="300" x2="500" y2="400" stroke="#2563eb" stroke-width="2"/>
+    <line x1="600" y1="300" x2="500" y2="400" stroke="#2563eb" stroke-width="2"/>
+    <line x1="300" y1="500" x2="400" y2="400" stroke="#2563eb" stroke-width="2"/>
+    <line x1="500" y1="500" x2="500" y2="400" stroke="#2563eb" stroke-width="2"/>
+  </g>
+  
+  <!-- Text label -->
+  <text x="600" y="600" font-family="Arial, sans-serif" font-size="48" font-weight="600" fill="#1e3a5f">IT Modernization</text>
+  <text x="600" y="650" font-family="Arial, sans-serif" font-size="32" fill="#4b5563">Non-Profit Solutions</text>
+</svg>
