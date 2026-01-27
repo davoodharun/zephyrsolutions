@@ -12,7 +12,8 @@
       { "label": "About", "url": "/#about", "order": 2 },
       { "label": "Services", "url": "/#services", "order": 3 },
       { "label": "Work", "url": "/#work", "order": 4 },
-      { "label": "Contact", "url": "/#contact", "order": 5 }
+      { "label": "Skills", "url": "/skills/", "order": 5 },
+      { "label": "Contact", "url": "/#contact", "order": 6 }
     ]
   },
   "social": {
