@@ -110,9 +110,13 @@ module.exports = function(eleventyConfig) {
   // Add pathPrefix filter to prefix URLs with the base path
   eleventyConfig.addFilter("base", function(url) {
     if (!url) return "";
-    // Don't modify external URLs, anchors, or mailto links
-    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("#") || url.startsWith("mailto:")) {
+    // Don't modify external URLs or mailto links
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//") || url.startsWith("mailto:")) {
       return url;
+    }
+    // Handle anchor links - prefix with basePath if not root
+    if (url.startsWith("#")) {
+      return pathPrefix === "/" ? url : `${pathPrefix}${url}`;
     }
     // If pathPrefix is "/", return the URL as-is (with leading slash)
     if (pathPrefix === "/") {

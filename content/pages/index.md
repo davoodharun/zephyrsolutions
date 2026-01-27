@@ -14,7 +14,7 @@ permalink: /
     </div>
     <p class="hero-subtitle">Making technology work for smaller organizations and non-profits</p>
     <p class="hero-description">We help organizations navigate technology challenges without the complexity. Think of us as your friendly tech partner who speaks your language—no confusing jargon, just practical solutions.</p>
-    <a href="#services" class="button hero-cta">See How We Can Help</a>
+    <a href="{{ '#services' | base }}" class="button hero-cta">See How We Can Help</a>
   </div>
   <div class="parallax-fg hero-illustration">
     <img src="{{ '/images/hero-illustration.png' | base }}" alt="Technology innovation" class="hero-illustration-image">

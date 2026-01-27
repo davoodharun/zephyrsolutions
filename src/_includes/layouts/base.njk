@@ -39,7 +39,8 @@
                             <a href="{{ '/' | base }}" class="nav-link" data-section="home">{{ item.label }}</a>
                         {% else %}
                             {% set sectionId = item.url | replace('/#', '') | replace('#', '') | replace('/', '') %}
-                            <a href="{{ '/#' | base }}{{ sectionId }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
+                            {% set anchorUrl = '#' + sectionId %}
+                            <a href="{{ anchorUrl | base }}" class="nav-link" data-section="{{ sectionId }}">{{ item.label }}</a>
                         {% endif %}
                     </li>
                     {% endfor %}
