@@ -4,7 +4,9 @@
   "description": "Company brochure website for Zephyr Solutions - IT consulting firm",
   "scripts": {
     "dev": "eleventy --serve --watch",
-    "build": "eleventy"
+    "build": "eleventy",
+    "functions:dev": "wrangler pages dev _site --functions functions",
+    "functions:deploy": "wrangler pages deploy _site"
   },
   "keywords": [
     "eleventy",
@@ -18,6 +20,14 @@
     "@11ty/eleventy-img": "^6.0.4",
     "@tinacms/cli": "^2.1.2",
     "@tinacms/datalayer": "^2.0.7",
-    "tinacms": "^3.3.2"
-  }
+    "tinacms": "^3.3.2",
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "@notionhq/client": "^2.2.15",
+    "resend": "^3.2.0",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.19.0"
+  },
+  "dependencies": {}
 }
