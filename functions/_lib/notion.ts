@@ -177,8 +177,9 @@ export async function updateNotionLead(
         {
           text: {
             content: JSON.stringify(report).slice(0, 2000)
+          }
         }
-      }
+      ]
     }
   };
   // Only set number/select if your Notion DB uses those types; otherwise add as rich_text
