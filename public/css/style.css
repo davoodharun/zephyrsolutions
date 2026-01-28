@@ -1008,100 +1008,6 @@ footer {
   background: var(--color-surface);
 }
 
-/* Clients Showcase */
-.clients-showcase {
-  margin-top: calc(var(--spacing-3xl) * 2);
-  padding-top: var(--spacing-3xl);
-  border-top: 1px solid rgba(124, 158, 255, 0.2);
-}
-
-.clients-showcase h3 {
-  font-size: var(--font-size-3xl);
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-md);
-  font-weight: var(--font-weight-semibold);
-  text-align: center;
-}
-
-.clients-intro {
-  font-size: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto var(--spacing-2xl) auto;
-  line-height: 1.7;
-}
-
-.clients-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-2xl);
-  max-width: 900px;
-  margin: 0 auto;
-  align-items: center;
-}
-
-.client-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--spacing-lg);
-  transition: all 0.3s ease;
-}
-
-.client-item:hover {
-  transform: translateY(-5px);
-}
-
-.client-logo {
-  width: 100%;
-  max-width: 180px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: rgba(124, 158, 255, 0.05);
-  border-radius: calc(var(--border-radius) * 2);
-  transition: all 0.3s ease;
-}
-
-.client-item:hover .client-logo {
-  background: rgba(124, 158, 255, 0.1);
-  box-shadow: var(--elevation-2);
-}
-
-.client-logo-image {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  filter: brightness(0.9);
-  transition: all 0.3s ease;
-}
-
-.client-item:hover .client-logo-image {
-  filter: brightness(1);
-  transform: scale(1.05);
-}
-
-.client-name {
-  font-size: var(--font-size-base);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
-  margin: 0;
-  opacity: 0.9;
-}
-
-.client-item:hover .client-name {
-  color: var(--color-primary-light);
-  opacity: 1;
-}
-
 .two-column-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1970,32 +1876,6 @@ html {
   .apply-list li {
     font-size: var(--font-size-base);
     padding-left: var(--spacing-lg);
-  }
-
-  /* Clients showcase mobile */
-  .clients-showcase {
-    margin-top: var(--spacing-2xl);
-    padding-top: var(--spacing-xl);
-  }
-
-  .clients-showcase h3 {
-    font-size: var(--font-size-2xl);
-  }
-
-  .clients-intro {
-    font-size: var(--font-size-base);
-    margin-bottom: var(--spacing-xl);
-  }
-
-  .clients-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
-    max-width: 100%;
-  }
-
-  .client-logo {
-    max-width: 150px;
-    height: 100px;
   }
 
   .portfolio-grid {

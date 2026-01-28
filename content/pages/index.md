@@ -37,32 +37,6 @@ permalink: /
         </div>
       </div>
     </div>
-    
-    <!-- Clients Section -->
-    <div class="clients-showcase">
-      <h3>Trusted by Organizations Like Yours</h3>
-      <p class="clients-intro">We're proud to work with a diverse range of organizations, from non-profits to small businesses, helping them leverage technology to achieve their goals.</p>
-      <div class="clients-grid">
-        <div class="client-item">
-          <div class="client-logo">
-            <img src="{{ '/images/clients/advocates-for-youth.png' | base }}" alt="Advocates for Youth" class="client-logo-image">
-          </div>
-          <p class="client-name">Advocates for Youth</p>
-        </div>
-        <div class="client-item">
-          <div class="client-logo">
-            <img src="{{ '/images/clients/dc-safeshores.png' | base }}" alt="DC SafeShores" class="client-logo-image">
-          </div>
-          <p class="client-name">DC SafeShores</p>
-        </div>
-        <div class="client-item">
-          <div class="client-logo">
-            <img src="{{ '/images/clients/shimizu-landscape.png' | base }}" alt="Shimizu Landscape and Design" class="client-logo-image">
-          </div>
-          <p class="client-name">Shimizu Landscape and Design</p>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
