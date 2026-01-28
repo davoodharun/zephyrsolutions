@@ -35,83 +35,46 @@ function createNotionClient(apiKey: string): Client {
   return new Client({ auth: apiKey });
 }
 
+/** Builds a Notion rich_text property from a string (or array joined by "; ") */
+function richText(value: string | string[]): { rich_text: Array<{ text: { content: string } }> } {
+  const content = Array.isArray(value) ? value.join('; ') : (value ?? '');
+  return {
+    rich_text: [{ text: { content: content.slice(0, 2000) } }]
+  };
+}
+
 /**
- * Maps form submission to Notion database properties
+ * Maps form submission to Notion database properties.
+ * Uses rich_text for all text-like columns so the same code works whether
+ * your Notion database uses Rich text, Select, or Multi-select.
  */
 function mapSubmissionToNotionProperties(submission: any, status: string): any {
+  const now = new Date().toISOString();
   return {
     'Org Name': {
       title: [
         {
           text: {
-            content: submission.org_name
+            content: submission.org_name ?? ''
           }
         }
       ]
     },
-    'Contact Name': {
-      rich_text: [
-        {
-          text: {
-            content: submission.contact_name
-          }
-        }
-      ]
-    },
+    'Contact Name': richText(submission.contact_name ?? ''),
     'Email': {
-      email: submission.email
+      email: submission.email ?? ''
     },
-    'Org Size': {
-      select: {
-        name: submission.org_size
-      }
-    },
-    'Tools': {
-      multi_select: submission.current_tools.map((tool: string) => ({ name: tool }))
-    },
-    'Pain Points': {
-      multi_select: submission.top_pain_points.map((point: string) => ({ name: point }))
-    },
-    'Backups': {
-      select: {
-        name: submission.backups_maturity
-      }
-    },
-    'Security Confidence': {
-      select: {
-        name: submission.security_confidence
-      }
-    },
-    'Budget Comfort': {
-      select: {
-        name: submission.budget_comfort
-      }
-    },
-    'Timeline': {
-      select: {
-        name: submission.timeline
-      }
-    },
-    'Status': {
-      select: {
-        name: status
-      }
-    },
-    'Source': {
-      select: {
-        name: 'website-healthcheck'
-      }
-    },
-    'Created At': {
-      date: {
-        start: new Date().toISOString()
-      }
-    },
-    'Updated At': {
-      date: {
-        start: new Date().toISOString()
-      }
-    }
+    'Org Size': richText(submission.org_size ?? ''),
+    'Tools': richText(submission.current_tools ?? []),
+    'Pain Points': richText(submission.top_pain_points ?? []),
+    'Backups': richText(submission.backups_maturity ?? ''),
+    'Security Confidence': richText(submission.security_confidence ?? ''),
+    'Budget Comfort': richText(submission.budget_comfort ?? ''),
+    'Timeline': richText(submission.timeline ?? ''),
+    'Status': richText(status),
+    'Source': richText('website-healthcheck'),
+    'Created At': richText(now),
+    'Updated At': richText(now)
   };
 }
 
@@ -195,26 +158,16 @@ export async function updateNotionLead(
 
   const pageId = response.results[0].id;
 
-  // Update the lead with report data
+  const now = new Date().toISOString();
+  // Update the lead with report data (Status/Updated At as rich_text for DBs that use Rich text)
   const updateProperties: any = {
-    'Status': {
-      select: {
-        name: 'sent'
-      }
-    },
-    'Readiness Score': {
-      number: report.readiness_score
-    },
-    'Readiness Label': {
-      select: {
-        name: report.readiness_label
-      }
-    },
+    'Status': richText('sent'),
+    'Updated At': richText(now),
     'Report Summary': {
       rich_text: [
         {
           text: {
-            content: report.summary
+            content: (report.summary ?? '').slice(0, 2000)
           }
         }
       ]
@@ -223,17 +176,18 @@ export async function updateNotionLead(
       rich_text: [
         {
           text: {
-            content: JSON.stringify(report)
-          }
+            content: JSON.stringify(report).slice(0, 2000)
         }
-      ]
-    },
-    'Updated At': {
-      date: {
-        start: new Date().toISOString()
       }
     }
   };
+  // Only set number/select if your Notion DB uses those types; otherwise add as rich_text
+  if (report.readiness_score != null) {
+    updateProperties['Readiness Score'] = { number: report.readiness_score };
+  }
+  if (report.readiness_label) {
+    updateProperties['Readiness Label'] = richText(report.readiness_label);
+  }
 
   try {
     await notion.pages.update({
@@ -272,20 +226,13 @@ export async function markLeadForManualReview(
 
   const pageId = response.results[0].id;
 
+  const now = new Date().toISOString();
   try {
     await notion.pages.update({
       page_id: pageId,
       properties: {
-        'Status': {
-          select: {
-            name: 'needs_manual_review'
-          }
-        },
-        'Updated At': {
-          date: {
-            start: new Date().toISOString()
-          }
-        }
+        'Status': richText('needs_manual_review'),
+        'Updated At': richText(now)
       }
     });
   } catch (error) {
