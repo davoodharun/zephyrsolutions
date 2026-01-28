@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 _site/
+dist/
+build/
 
 # Environment variables
 .env
@@ -41,3 +43,11 @@ docs/_build/
 
 # Image uploads (if using separate upload directory)
 public/images/uploads/
+
+# Cloudflare Workers
+.wrangler/
+wrangler.toml.local
+*.wasm
+
+# TypeScript
+*.tsbuildinfo

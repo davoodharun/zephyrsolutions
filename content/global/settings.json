@@ -13,7 +13,8 @@
       { "label": "Services", "url": "/#services", "order": 3 },
       { "label": "Work", "url": "/#work", "order": 4 },
       { "label": "Skills", "url": "/skills/", "order": 5 },
-      { "label": "Contact", "url": "/#contact", "order": 6 }
+      { "label": "Health Check", "url": "/health-check/", "order": 6 },
+      { "label": "Contact", "url": "/#contact", "order": 7 }
     ]
   },
   "social": {

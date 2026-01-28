@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "version",
+    "summary",
+    "readiness_score",
+    "readiness_label",
+    "top_risks",
+    "top_priorities",
+    "do_not_worry_yet",
+    "next_steps",
+    "recommended_entry_offer",
+    "admin_notes"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 50,
+      "maxLength": 500
+    },
+    "readiness_score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "readiness_label": {
+      "type": "string",
+      "enum": ["Watch", "Plan", "Act"]
+    },
+    "top_risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "description", "severity"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 300
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 5
+    },
+    "top_priorities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "description", "impact"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 300
+          },
+          "impact": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 2,
+      "maxItems": 4
+    },
+    "do_not_worry_yet": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 300
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 3
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "description", "timeline"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 300
+          },
+          "timeline": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 50
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 3,
+      "maxItems": 6
+    },
+    "recommended_entry_offer": {
+      "type": "string",
+      "enum": ["Free resources", "Fixed-price assessment", "Short call"]
+    },
+    "admin_notes": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500
+    }
+  },
+  "additionalProperties": false
+}
