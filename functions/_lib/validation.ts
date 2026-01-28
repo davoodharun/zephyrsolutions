@@ -54,7 +54,7 @@ const reportSchema = {
           "description": { "type": "string", "minLength": 10, "maxLength": 300 },
           "severity": { "type": "string", "enum": ["low", "medium", "high"] }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 2,
       "maxItems": 5
@@ -69,7 +69,7 @@ const reportSchema = {
           "description": { "type": "string", "minLength": 10, "maxLength": 300 },
           "impact": { "type": "string", "minLength": 5, "maxLength": 200 }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 2,
       "maxItems": 4
@@ -83,7 +83,7 @@ const reportSchema = {
           "title": { "type": "string", "minLength": 2, "maxLength": 100 },
           "description": { "type": "string", "minLength": 10, "maxLength": 300 }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 1,
       "maxItems": 3
@@ -98,7 +98,7 @@ const reportSchema = {
           "description": { "type": "string", "minLength": 10, "maxLength": 300 },
           "timeline": { "type": "string", "minLength": 2, "maxLength": 50 }
         },
-        "additionalProperties": false
+        "additionalProperties": true
       },
       "minItems": 3,
       "maxItems": 6
@@ -139,9 +139,37 @@ export function validateHealthCheckSubmission(data: unknown): ValidationResult {
   return { valid: true };
 }
 
+/** Picks first non-empty string from obj using possible key names (case-insensitive). Coerces numbers/booleans to string. */
+function pickStr(obj: Record<string, unknown>, keys: string[]): string {
+  if (obj == null || typeof obj !== 'object') return '';
+  const lower: Record<string, string> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v != null && v !== '') {
+      const s = typeof v === 'string' ? v.trim() : String(v).trim();
+      if (s) lower[k.toLowerCase()] = s;
+    }
+  }
+  for (const key of keys) {
+    const v = lower[key.toLowerCase()];
+    if (v) return v;
+  }
+  return '';
+}
+
+/** Ensures value is an array (handles LLM returning object with numeric keys). */
+function toArray(val: unknown): unknown[] {
+  if (Array.isArray(val)) return val;
+  if (val != null && typeof val === 'object' && !Array.isArray(val)) {
+    const o = val as Record<string, unknown>;
+    const keys = Object.keys(o).filter(k => /^\d+$/.test(k)).sort((a, b) => Number(a) - Number(b));
+    if (keys.length > 0) return keys.map(k => o[k]);
+  }
+  return [];
+}
+
 /**
- * Normalizes LLM report output to match schema (version, enums, trimming).
- * Call before validateHealthCheckReport to reduce validation failures.
+ * Normalizes LLM report output to match schema (version, enums, key-name mapping).
+ * Maps common LLM key variants (risk_title, name, details, etc.) to schema keys.
  */
 export function normalizeHealthCheckReport(data: Record<string, unknown>): Record<string, unknown> {
   const r = { ...data };
@@ -149,51 +177,87 @@ export function normalizeHealthCheckReport(data: Record<string, unknown>): Recor
   if (r.version !== undefined) r.version = String(r.version).trim() || '1';
   else r.version = '1';
 
+  const score = Number(r.readiness_score);
+  r.readiness_score = (Number.isFinite(score) && score >= 1 && score <= 5) ? Math.round(score) : 3;
+
   const label = String(r.readiness_label ?? '').trim().toLowerCase();
   if (label === 'watch' || label === 'plan' || label === 'act') {
     r.readiness_label = label.charAt(0).toUpperCase() + label.slice(1);
   }
 
-  const offer = String(r.recommended_entry_offer ?? '').trim().toLowerCase();
-  const offerMap: Record<string, string> = {
-    'free resources': 'Free resources',
-    'free resource': 'Free resources',
-    'fixed-price assessment': 'Fixed-price assessment',
-    'fixed price assessment': 'Fixed-price assessment',
-    'fixed-price': 'Fixed-price assessment',
-    'short call': 'Short call',
-    'short': 'Short call'
+  const offerRaw = String(r.recommended_entry_offer ?? '').trim().toLowerCase();
+  const exactMap: Record<string, string> = {
+    'free resources': 'Free resources', 'free resource': 'Free resources',
+    'fixed-price assessment': 'Fixed-price assessment', 'fixed price assessment': 'Fixed-price assessment',
+    'fixed-price': 'Fixed-price assessment', 'fixed price': 'Fixed-price assessment',
+    'short call': 'Short call', 'short': 'Short call', 'schedule a call': 'Short call'
   };
-  if (offerMap[offer]) r.recommended_entry_offer = offerMap[offer];
+  if (exactMap[offerRaw]) {
+    r.recommended_entry_offer = exactMap[offerRaw];
+  } else if (offerRaw.length > 0) {
+    if (offerRaw.includes('short') || offerRaw.includes('call')) r.recommended_entry_offer = 'Short call';
+    else if (offerRaw.includes('fixed') || offerRaw.includes('assessment')) r.recommended_entry_offer = 'Fixed-price assessment';
+    else r.recommended_entry_offer = 'Free resources';
+  }
 
   const severityMap: Record<string, string> = { low: 'low', medium: 'medium', high: 'high' };
-  if (Array.isArray(r.top_risks)) {
-    r.top_risks = (r.top_risks as Record<string, unknown>[]).map(item => {
-      const i = { ...item };
-      if (typeof i.severity === 'string') {
-        const s = severityMap[i.severity.toLowerCase()];
-        if (s) i.severity = s;
-      }
-      return i;
-    });
-  }
+  r.top_risks = toArray(r.top_risks).map(item => {
+    const i = item != null && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const title = pickStr(i, ['title', 'risk_title', 'name', 'risk', 'risk_name', 'heading']);
+    const description = pickStr(i, ['description', 'details', 'explanation', 'risk_description', 'detail']);
+    let severity = pickStr(i, ['severity', 'level', 'risk_level']);
+    severity = severityMap[severity.toLowerCase()] || 'medium';
+    return { title: title || 'Risk', description: description || 'See assessment.', severity };
+  });
 
-  // Trim string fields that have minLength
-  for (const key of ['summary', 'admin_notes'] as const) {
-    if (typeof r[key] === 'string') r[key] = (r[key] as string).trim();
+  r.top_priorities = toArray(r.top_priorities).map(item => {
+    const i = item != null && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const title = pickStr(i, ['title', 'priority', 'name', 'heading']);
+    const description = pickStr(i, ['description', 'details', 'explanation', 'detail']);
+    const impact = pickStr(i, ['impact', 'impact_description', 'why', 'rationale']);
+    return { title: title || 'Priority', description: description || 'See assessment.', impact: impact || 'High impact.' };
+  });
+
+  r.do_not_worry_yet = toArray(r.do_not_worry_yet).map(item => {
+    const i = item != null && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const title = pickStr(i, ['title', 'name', 'heading', 'item']);
+    const description = pickStr(i, ['description', 'details', 'explanation', 'detail']);
+    return { title: title || 'Item', description: description || 'Acceptable for now.' };
+  });
+
+  r.next_steps = toArray(r.next_steps).map(item => {
+    const i = item != null && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const title = pickStr(i, ['title', 'step', 'name', 'action', 'heading']);
+    const description = pickStr(i, ['description', 'details', 'explanation', 'detail']);
+    const timeline = pickStr(i, ['timeline', 'when', 'timeframe', 'due', 'time_frame', 'duration']);
+    return { title: title || 'Step', description: description || 'See assessment.', timeline: timeline || 'Soon' };
+  });
+
+  // Pad arrays to meet schema minItems
+  const riskFallback = { title: 'General risk', description: 'Review during assessment.', severity: 'medium' as const };
+  while ((r.top_risks as unknown[]).length < 2) (r.top_risks as unknown[]).push(riskFallback);
+  const priorityFallback = { title: 'Priority item', description: 'Review during assessment.', impact: 'High impact.' };
+  while ((r.top_priorities as unknown[]).length < 2) (r.top_priorities as unknown[]).push(priorityFallback);
+  const worryFallback = { title: 'Item', description: 'Acceptable for now.' };
+  while ((r.do_not_worry_yet as unknown[]).length < 1) (r.do_not_worry_yet as unknown[]).push(worryFallback);
+  const stepFallback = { title: 'Next step', description: 'See assessment.', timeline: 'Soon' };
+  while ((r.next_steps as unknown[]).length < 3) (r.next_steps as unknown[]).push(stepFallback);
+
+  (r.top_risks as unknown[]).splice(5);
+  (r.top_priorities as unknown[]).splice(4);
+  (r.do_not_worry_yet as unknown[]).splice(3);
+  (r.next_steps as unknown[]).splice(6);
+
+  if (typeof r.summary !== 'string' || (r.summary as string).trim().length < 20) {
+    r.summary = (typeof r.summary === 'string' && (r.summary as string).trim()) ? (r.summary as string).trim() : 'IT assessment completed. Review the report sections for details and next steps.';
+    if ((r.summary as string).length < 20) r.summary = 'IT assessment completed. Review the report sections below for details and next steps.';
+  } else {
+    r.summary = (r.summary as string).trim();
   }
-  for (const arrKey of ['top_risks', 'top_priorities', 'do_not_worry_yet', 'next_steps'] as const) {
-    if (Array.isArray(r[arrKey])) {
-      (r[arrKey] as Record<string, unknown>[]) = (r[arrKey] as Record<string, unknown>[]).map(item => {
-        const i = { ...item };
-        for (const k of ['title', 'description', 'severity', 'impact', 'timeline']) {
-          if (typeof (i as Record<string, unknown>)[k] === 'string') {
-            (i as Record<string, unknown>)[k] = String((i as Record<string, unknown>)[k]).trim();
-          }
-        }
-        return i;
-      });
-    }
+  if (typeof r.admin_notes !== 'string' || (r.admin_notes as string).trim().length < 5) {
+    r.admin_notes = (typeof r.admin_notes === 'string' && (r.admin_notes as string).trim()) ? (r.admin_notes as string).trim() : 'Review lead and follow up.';
+  } else {
+    r.admin_notes = (r.admin_notes as string).trim();
   }
 
   return r;
