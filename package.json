@@ -6,7 +6,7 @@
     "dev": "eleventy --serve --watch",
     "build": "eleventy",
     "functions:dev": "wrangler pages dev _site --functions functions",
-    "functions:deploy": "wrangler pages deploy _site"
+    "functions:deploy": "wrangler pages deploy _site --project-name=zephyrsolutions"
   },
   "keywords": [
     "eleventy",

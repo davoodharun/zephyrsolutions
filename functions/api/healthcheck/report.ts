@@ -3,13 +3,16 @@
  * Renders HTML report page for a given token
  */
 
-import type { Env } from '../../_lib/env';
+import type { Env } from '../types';
 import { validateEnv } from '../../_lib/env';
 import { verifyReportToken } from '../../_lib/crypto';
 import { getNotionLead } from '../../_lib/notion';
 import { renderReportHTML, renderErrorPage } from '../../_lib/html';
 
-export default async function(request: Request, env: Env): Promise<Response> {
+export const onRequestGet = async (context: { request: Request; env: Env }) => {
+  const request = context.request;
+  const env = context.env;
+  
   try {
     // Validate environment
     validateEnv(env);

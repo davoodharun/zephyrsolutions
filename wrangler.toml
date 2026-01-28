@@ -3,6 +3,7 @@
 
 name = "zephyrsolutions"
 compatibility_date = "2026-01-28"
+pages_build_output_dir = "./_site"
 
 # Pages Functions are automatically detected from functions/ directory
 # No additional configuration needed for Pages Functions

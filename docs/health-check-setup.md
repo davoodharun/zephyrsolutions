@@ -81,7 +81,40 @@ npm run functions:dev
 
 ## Deployment
 
-The site deploys automatically to Cloudflare Pages when you push to the main branch. Ensure all environment variables are set in the Cloudflare Pages dashboard.
+### Use Cloudflare Pages (not Workers)
+
+**Important:** When you connect a GitHub repository to Cloudflare Pages, Cloudflare automatically handles deployment. You should NOT include `wrangler pages deploy` in your build command.
+
+#### Correct Configuration
+
+1. **In the Cloudflare dashboard** go to your project → **Settings** → **Builds & deployments**.
+2. **Build command:** `npm run build` (ONLY this - no deploy command)
+3. **Build output directory:** `_site`
+4. **Root directory:** `/` (leave empty or set to root)
+5. **Do NOT add a custom deploy command** - Cloudflare Pages will automatically:
+   - Deploy the `_site` directory as static assets
+   - Detect and deploy the `functions/` directory automatically
+   - Make "Variables and Secrets" available once Functions are detected
+
+#### Why This Works
+
+When Cloudflare Pages runs your build:
+1. It executes `npm run build` which creates `_site/`
+2. It automatically scans the repository for a `functions/` directory
+3. It deploys both the static site (`_site/`) and Functions together
+4. Functions become available in the dashboard, enabling "Variables and Secrets"
+
+#### If You See "No Functions" Error
+
+If you previously had a custom deploy command like `npx wrangler deploy --assets=./_site`, remove it. That command deploys to **Workers** (not Pages) and ignores Functions.
+
+#### Manual Deployment (Optional)
+
+If you need to deploy manually from your local machine (not recommended for CI/CD):
+```bash
+npx wrangler pages deploy _site --project-name=zephyrsolutions
+```
+But for GitHub-connected projects, let Cloudflare handle deployment automatically.
 
 ## Testing
 

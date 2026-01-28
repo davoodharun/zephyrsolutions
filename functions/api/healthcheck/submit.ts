@@ -3,7 +3,7 @@
  * Handles health check form submissions
  */
 
-import type { Env } from '../../_lib/env';
+import type { Env } from '../types';
 import { validateEnv } from '../../_lib/env';
 import { validateHealthCheckSubmission, validateHoneypot, validateHealthCheckReport } from '../../_lib/validation';
 import { createNotionLead, updateNotionLead, markLeadForManualReview } from '../../_lib/notion';
@@ -163,30 +163,27 @@ Output the corrected JSON that:
 Output ONLY the corrected JSON. No markdown, no code blocks, no explanations - just the corrected JSON object.`;
 }
 
-export default async function(request: Request, env: Env): Promise<Response> {
+// Handle CORS preflight requests
+export const onRequestOptions = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400'
+    }
+  });
+};
+
+// Handle POST requests
+export const onRequestPost = async (context: { request: Request; env: Env }) => {
+  const request = context.request;
+  const env = context.env;
+  
   try {
     // Validate environment
     validateEnv(env);
-
-    // Handle CORS preflight
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        status: 204,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        }
-      });
-    }
-
-    // Only allow POST
-    if (request.method !== 'POST') {
-      return new Response(JSON.stringify({ ok: false, error: 'method_not_allowed' }), {
-        status: 405,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
 
     // Get client IP for rate limiting
     const clientIP = request.headers.get('CF-Connecting-IP') || 
@@ -267,11 +264,8 @@ export default async function(request: Request, env: Env): Promise<Response> {
     let reportJson: string;
     let report: any;
     try {
-      // Load prompts (in production, load from KV or bundle at build time)
-      const systemPrompt = `You are a conservative nonprofit IT advisor. Use plain English, focus on stability and affordability. Output JSON only, no markdown.`;
-      const reportPrompt = `Generate an IT health check report for this organization: ${JSON.stringify(submission)}. Output must match the HealthCheckReport schema exactly.`;
-      
-      reportJson = await generateReport(submission, systemPrompt, reportPrompt, env);
+      const reportPrompt = getReportPrompt(submission);
+      reportJson = await generateReport(submission, SYSTEM_PROMPT, reportPrompt, env);
       report = JSON.parse(reportJson);
     } catch (error) {
       console.error('LLM report generation failed:', error);
@@ -339,7 +333,7 @@ export default async function(request: Request, env: Env): Promise<Response> {
 
     // Generate and send email
     try {
-      const emailPrompt = `Generate a warm email for ${submission.contact_name} at ${submission.org_name} with their IT health check report. Include readiness score ${report.readiness_score} (${report.readiness_label}) and link: ${reportUrl}`;
+      const emailPrompt = getEmailPrompt(report, submission.org_name, submission.contact_name, reportUrl);
       const emailContent = await generateEmailContent(
         report,
         submission.org_name,
