@@ -159,7 +159,16 @@ export async function updateNotionLead(
   const pageId = response.results[0].id;
 
   const now = new Date().toISOString();
-  // Update the lead with report data (Status/Updated At as rich_text for DBs that use Rich text)
+  // Notion rich_text has a 2000-char limit per segment; chunk Report JSON so we store the full report
+  const reportJsonStr = JSON.stringify(report);
+  const chunkSize = 2000;
+  const reportJsonChunks: Array<{ text: { content: string } }> = [];
+  for (let i = 0; i < reportJsonStr.length; i += chunkSize) {
+    reportJsonChunks.push({
+      text: { content: reportJsonStr.slice(i, i + chunkSize) }
+    });
+  }
+
   const updateProperties: any = {
     'Status': richText('sent'),
     'Updated At': richText(now),
@@ -173,13 +182,7 @@ export async function updateNotionLead(
       ]
     },
     'Report JSON': {
-      rich_text: [
-        {
-          text: {
-            content: JSON.stringify(report).slice(0, 2000)
-          }
-        }
-      ]
+      rich_text: reportJsonChunks
     }
   };
   // Only set number/select if your Notion DB uses those types; otherwise add as rich_text
@@ -269,12 +272,24 @@ export async function getNotionLead(
     const page = response.results[0];
     const properties = (page as any).properties;
 
-    // Extract report JSON if available
-    const reportJson = properties['Report JSON']?.rich_text?.[0]?.text?.content;
+    // Extract report JSON (may be chunked across multiple rich_text segments; Notion limit 2000 chars each)
+    const richTextBlocks = properties['Report JSON']?.rich_text ?? [];
+    const reportJsonStr = richTextBlocks
+      .map((b: any) => b?.text?.content ?? '')
+      .filter(Boolean)
+      .join('');
+    let reportJson = null;
+    if (reportJsonStr) {
+      try {
+        reportJson = JSON.parse(reportJsonStr);
+      } catch {
+        reportJson = null;
+      }
+    }
 
     return {
       leadId,
-      reportJson: reportJson ? JSON.parse(reportJson) : null,
+      reportJson,
       properties
     };
   } catch (error) {

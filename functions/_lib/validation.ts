@@ -169,7 +169,14 @@ function toArray(val: unknown): unknown[] {
 
 /**
  * Normalizes LLM report output to match schema (version, enums, key-name mapping).
- * Maps common LLM key variants (risk_title, name, details, etc.) to schema keys.
+ *
+ * Why: We send a prompt asking for JSON that "matches the HealthCheckReport schema",
+ * but we don't send the actual schema—so the LLM often returns different key names
+ * (e.g. risk_title, Risk Title, name instead of title), different structure
+ * (e.g. {"0": {...}, "1": {...}} instead of [{...}, {...}]), or different enums
+ * (e.g. "watch" instead of "Watch"). We map that raw output into the exact shape
+ * the schema expects so validation passes without changing the prompt or sending
+ * the full schema every time.
  */
 export function normalizeHealthCheckReport(data: Record<string, unknown>): Record<string, unknown> {
   const r = { ...data };

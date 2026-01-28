@@ -120,6 +120,8 @@ But for GitHub-connected projects, let Cloudflare handle deployment automaticall
 
 ## Testing
 
+**Report normalization (no LLM, no Cloudflare):** From repo root run `npm run test:report` to test that LLM-like JSON (different key names, object-as-array) is normalized and passes validation. This exercises the mapping from raw LLM output to schema shape.
+
 1. Submit the form at `/health-check/`
 2. Check that a lead is created in Notion with status `pending_generation`
 3. Verify email is received with report link
