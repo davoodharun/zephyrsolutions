@@ -5,7 +5,7 @@
 
 import type { Env } from '../types';
 import { validateEnv } from '../../_lib/env';
-import { validateHealthCheckSubmission, validateHoneypot, validateHealthCheckReport } from '../../_lib/validation';
+import { validateHealthCheckSubmission, validateHoneypot, validateHealthCheckReport, normalizeHealthCheckReport } from '../../_lib/validation';
 import { createNotionLead, updateNotionLead, markLeadForManualReview } from '../../_lib/notion';
 import { generateReport, repairReport, generateEmailContent } from '../../_lib/llm';
 import { generateReportToken } from '../../_lib/crypto';
@@ -301,15 +301,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       });
     }
 
-    // Validate report JSON
+    // Normalize and validate report JSON
+    report = normalizeHealthCheckReport(report as Record<string, unknown>) as any;
     let reportValidation = validateHealthCheckReport(report);
-    
+
     // Attempt repair if validation fails
     if (!reportValidation.valid) {
       try {
         const repairPrompt = getRepairPrompt(reportJson, JSON.stringify(reportValidation.errors));
         reportJson = await repairReport(reportJson, JSON.stringify(reportValidation.errors), repairPrompt, env);
-        report = JSON.parse(reportJson);
+        report = normalizeHealthCheckReport(JSON.parse(reportJson) as Record<string, unknown>) as any;
         reportValidation = validateHealthCheckReport(report);
       } catch (repairError) {
         console.error('Report repair failed:', repairError);
@@ -323,11 +324,12 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         subject: 'Thank you for your IT Health Check submission',
         body: `Hi ${submission.contact_name},\n\nThank you for completing the IT Health Check assessment for ${submission.org_name}. We're reviewing your submission and will send your personalized report shortly.\n\nBest regards,\nZephyr Solutions`
       }, env);
-      
+
       return new Response(JSON.stringify({
         ok: false,
         error: 'report_validation_failed',
-        message: 'We received your submission and will process it manually.'
+        message: 'We received your submission and will process it manually.',
+        validation_errors: reportValidation.errors
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
