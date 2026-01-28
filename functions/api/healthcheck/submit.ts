@@ -261,6 +261,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     }
 
     // Generate report via LLM
+    const llmKeySet = !!(env.LLM_API_KEY && String(env.LLM_API_KEY).trim());
+    const llmUrlConfigured = !!(env.LLM_API_URL && String(env.LLM_API_URL).trim());
+    const llmBaseUrl = env.LLM_API_URL?.trim() || 'https://api.openai.com/v1';
+    console.log('LLM call: key_set=', llmKeySet, 'key_length=', env.LLM_API_KEY?.length ?? 0, 'url=', llmBaseUrl);
+
     let reportJson: string;
     let report: any;
     try {
@@ -276,11 +281,20 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         subject: 'Thank you for your IT Health Check submission',
         body: `Hi ${submission.contact_name},\n\nThank you for completing the IT Health Check assessment for ${submission.org_name}. We're processing your results and will send your personalized report shortly.\n\nIf you have any questions, please don't hesitate to reach out.\n\nBest regards,\nZephyr Solutions`
       }, env);
-      
+      // Include safe error detail in response for debugging (no keys/tokens)
+      const safeDetail = errMsg
+        .replace(/\b(sk-|Bearer\s+)[^\s]+/gi, '[REDACTED]')
+        .slice(0, 200);
       return new Response(JSON.stringify({
         ok: false,
         error: 'report_generation_failed',
-        message: 'Report generation is temporarily unavailable. We will process your submission manually.'
+        message: 'Report generation is temporarily unavailable. We will process your submission manually.',
+        error_detail: safeDetail,
+        debug: {
+          llm_key_set: llmKeySet,
+          llm_url_configured: llmUrlConfigured,
+          llm_base_url: llmBaseUrl
+        }
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
@@ -364,11 +378,14 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     });
 
   } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error);
     console.error('Unexpected error in submit endpoint:', error);
+    const isMissingEnv = /missing required environment variable/i.test(errMsg);
     return new Response(JSON.stringify({
       ok: false,
       error: 'internal_error',
-      message: 'An unexpected error occurred. Please try again later.'
+      message: isMissingEnv ? errMsg : 'An unexpected error occurred. Please try again later.',
+      ...(isMissingEnv && { debug: { hint: 'Set Secrets in Cloudflare Pages → Settings → Environment variables (Production and Preview)' } })
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

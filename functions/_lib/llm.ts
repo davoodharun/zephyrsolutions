@@ -17,6 +17,7 @@ export interface LLMResponse {
 
 const MAX_RETRIES = 3;
 const INITIAL_BACKOFF_MS = 1000;
+const LLM_REQUEST_TIMEOUT_MS = 55000; // Under 60s Worker limit
 
 function isRetryableStatus(status: number): boolean {
   return status === 429 || (status >= 500 && status < 600);
@@ -64,8 +65,14 @@ async function fetchWithRetry(
   let backoff = INITIAL_BACKOFF_MS;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), LLM_REQUEST_TIMEOUT_MS);
     try {
-      const response = await fetch(endpoint, options);
+      const response = await fetch(endpoint, {
+        ...options,
+        signal: options.signal ?? controller.signal
+      });
+      clearTimeout(timeoutId);
       if (response.ok) return response;
       const { code, message, isRetryable } = await parseErrorResponse(response);
       const shouldRetry = isRetryable === true || isRetryableStatus(response.status) || isRetryableErrorCode(code);
@@ -77,8 +84,12 @@ async function fetchWithRetry(
       }
       throw new Error(`LLM API error: ${message}`);
     } catch (err) {
+      clearTimeout(timeoutId);
       lastError = err instanceof Error ? err : new Error(String(err));
-      const isNetwork = lastError.message.includes('fetch') || lastError.message.includes('network') || lastError.message.includes('Failed to fetch');
+      if (err instanceof Error && err.name === 'AbortError') {
+        lastError = new Error(`LLM request timed out after ${LLM_REQUEST_TIMEOUT_MS / 1000}s`);
+      }
+      const isNetwork = lastError.message.includes('fetch') || lastError.message.includes('network') || lastError.message.includes('Failed to fetch') || lastError.message.includes('timed out');
       if (attempt < MAX_RETRIES && isNetwork) {
         console.warn(`LLM API attempt ${attempt}/${MAX_RETRIES} network error. Retrying in ${backoff}ms...`);
         await sleep(backoff);

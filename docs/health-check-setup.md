@@ -11,7 +11,9 @@ This guide explains how to set up and configure the AI-driven IT Health Check wo
 
 ## Environment Variables
 
-Set the following environment variables in Cloudflare Pages dashboard (Settings → Environment Variables):
+Set the following environment variables in Cloudflare Pages dashboard (**Settings** → **Environment variables**).
+
+**Important:** Add variables for **both Production and Preview** if you test on preview URLs (e.g. `*.pages.dev`). Use the **Production** / **Preview** toggle when adding each variable. Secrets (like `LLM_API_KEY`) are not shared between environments.
 
 ### Required Variables
 
@@ -137,7 +139,10 @@ This happens when the **LLM call fails** (e.g. `resource_exhausted`, rate limit,
 
 **What to check:**
 
-1. **Cloudflare logs** – Look for `LLM report generation failed:` and the error message. The code now retries up to 3 times with backoff for 429, 5xx, and `resource_exhausted`-style errors.
-2. **LLM provider** – If using OpenAI: check [usage and limits](https://platform.openai.com/usage). If using a proxy/gateway (e.g. Cloudflare AI Gateway): check its quota and that the gateway allows requests from your Pages Function.
-3. **`LLM_API_URL`** – Must be reachable from Cloudflare’s network. Some providers block or throttle datacenter IPs; try the official API URL or a gateway that supports Workers.
-4. **Leads in Notion** – Failed runs mark the lead as `needs_manual_review` so you can process them manually or resubmit after fixing the LLM.
+1. **500 response body** – When report generation fails, the JSON includes `error_detail` and `debug`:
+   - `debug.llm_key_set: false` → **LLM_API_KEY is not set** for this deployment. In Cloudflare Pages → **Settings** → **Environment variables**, add `LLM_API_KEY` as a **Secret** for **Production** (and **Preview** if you test on `*.pages.dev`).
+   - `debug.llm_key_set: true` but no usage on your LLM provider → Request may be going to `debug.llm_base_url` (wrong URL), or failing before the API (timeout/block).
+2. **Cloudflare Real-time Logs** – Look for `LLM call: key_set= ... url= ...` and `LLM report generation failed:`. If you never see `LLM call:`, the failure happened earlier (e.g. Notion).
+3. **LLM provider** – If using OpenAI: check [usage and limits](https://platform.openai.com/usage). If using a proxy/gateway: check its quota and that it allows requests from Cloudflare Workers.
+4. **`LLM_API_URL`** – Must be reachable from Cloudflare’s network. Use `https://api.openai.com/v1` for OpenAI, or leave unset to use that default.
+5. **Leads in Notion** – Failed runs mark the lead as `needs_manual_review` so you can process them manually or resubmit after fixing the LLM.

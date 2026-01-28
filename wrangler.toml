@@ -10,6 +10,7 @@ pages_build_output_dir = "./_site"
 PUBLIC_BASE_URL = "https://zephyrsolutions.pages.dev"
 EMAIL_FROM = "noreply@zephyrsolutions.info"
 EMAIL_PROVIDER = "resend"
+LLM_API_URL = "https://api.openai.com/v1"
 # Add other non-sensitive config here, e.g. feature flags, public URLs
 
 # Pages Functions are automatically detected from functions/ directory
