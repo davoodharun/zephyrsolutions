@@ -7,6 +7,7 @@ pages_build_output_dir = "./_site"
 
 # Non-secret environment variables (plain text; do NOT put API keys here)
 [vars]
+PUBLIC_BASE_URL = "https://zephyrsolutions.pages.dev"
 EMAIL_FROM = "noreply@zephyrsolutions.info"
 EMAIL_PROVIDER = "resend"
 # Add other non-sensitive config here, e.g. feature flags, public URLs
