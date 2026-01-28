@@ -1,12 +1,8 @@
-# Cloudflare Workers configuration for local development
-# This file is optional - Cloudflare Pages will use functions/ directory automatically
-# Use this for local testing with wrangler
+# Cloudflare Pages Functions configuration
+# This file is used by Cloudflare Pages during build and deployment
 
-name = "zephyr-solutions"
-compatibility_date = "2024-01-01"
-
-[env.production]
-name = "zephyr-solutions"
+name = "zephyrsolutions"
+compatibility_date = "2026-01-28"
 
 # Pages Functions are automatically detected from functions/ directory
 # No additional configuration needed for Pages Functions
