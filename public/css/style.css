@@ -1409,39 +1409,197 @@ html {
 }
 
 /* Skills page specific styles */
-.skills-intro {
-  margin-bottom: var(--spacing-3xl);
+.skills-hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  padding: var(--spacing-3xl) var(--spacing-lg);
 }
 
-.skills-intro .lead {
-  font-size: var(--font-size-xl);
-  line-height: 1.7;
+.skills-section {
+  padding: var(--spacing-3xl) var(--spacing-lg);
+}
+
+.skills-section h2 {
+  font-size: var(--font-size-4xl);
   color: var(--color-text-primary);
-  max-width: 800px;
-}
-
-.section h3 {
-  font-size: var(--font-size-2xl);
-  color: var(--color-primary-light);
-  margin-top: var(--spacing-3xl);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   font-weight: var(--font-weight-semibold);
+  text-align: center;
 }
 
-.section h3:first-of-type {
+.skills-section .section-intro {
+  font-size: var(--font-size-xl);
+  color: var(--color-primary-light);
+  max-width: 800px;
+  margin: 0 auto var(--spacing-3xl) auto;
+  text-align: center;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.7;
+  opacity: 1;
+}
+
+.skill-category {
   margin-top: var(--spacing-2xl);
 }
 
-.section p {
+.skill-category .column-left p {
   font-size: var(--font-size-lg);
   line-height: 1.7;
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-md);
 }
 
-.section strong {
+/* Tool badges */
+.tool-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.tool-badge {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(124, 158, 255, 0.15);
+  border: 1px solid var(--color-primary);
+  border-radius: calc(var(--border-radius) * 3);
+  color: var(--color-primary-light);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  box-shadow: var(--elevation-1);
+}
+
+.tool-badge:hover {
+  background: rgba(124, 158, 255, 0.25);
+  border-color: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+.tool-badge--primary {
+  background: rgba(124, 158, 255, 0.2);
+  border-color: var(--color-primary);
   color: var(--color-primary-light);
   font-weight: var(--font-weight-semibold);
+}
+
+.tool-badge--primary:hover {
+  background: rgba(124, 158, 255, 0.3);
+  box-shadow: var(--elevation-2), var(--glow-primary);
+}
+
+.tool-badge--secondary {
+  background: rgba(167, 139, 250, 0.15);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-light);
+}
+
+.tool-badge--secondary:hover {
+  background: rgba(167, 139, 250, 0.25);
+  border-color: var(--color-secondary-light);
+  box-shadow: var(--elevation-2), var(--glow-secondary);
+}
+
+/* Skill illustrations */
+.skill-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  padding: var(--spacing-xl);
+}
+
+.skill-icon {
+  font-size: 8rem;
+  opacity: 0.6;
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  transition: all 0.3s ease;
+}
+
+.skill-icon--frontend {
+  color: var(--color-primary-light);
+}
+
+.skill-icon--backend {
+  color: var(--color-secondary-light);
+}
+
+.skill-icon--cloud {
+  color: var(--color-accent-light);
+}
+
+.skill-icon--testing {
+  color: var(--color-primary-light);
+}
+
+.skill-icon--automation {
+  color: var(--color-secondary-light);
+}
+
+/* Skills apply section */
+.skills-apply-section {
+  padding: var(--spacing-3xl) var(--spacing-lg);
+}
+
+.skills-apply-section h2 {
+  font-size: var(--font-size-4xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+.apply-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.apply-content p {
+  font-size: var(--font-size-lg);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.apply-list {
+  list-style: none;
+  padding-left: 0;
+  margin: var(--spacing-lg) 0;
+}
+
+.apply-list li {
+  font-size: var(--font-size-lg);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+  position: relative;
+}
+
+.apply-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary-light);
+  font-weight: var(--font-weight-semibold);
+}
+
+.apply-list li strong {
+  color: var(--color-primary-light);
+  font-weight: var(--font-weight-semibold);
+}
+
+.apply-content .cta-section {
+  text-align: center;
+  margin-top: var(--spacing-2xl);
 }
 
 /* ==========================================================================
@@ -1632,7 +1790,8 @@ html {
   }
 
   .service-item,
-  .portfolio-item {
+  .portfolio-item,
+  .skill-category {
     margin-top: var(--spacing-2xl);
     margin-bottom: var(--spacing-xl);
   }
@@ -1663,6 +1822,60 @@ html {
     gap: var(--spacing-xl);
     margin-top: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+  }
+
+  /* Skills page mobile styles */
+  .skills-hero-section {
+    min-height: 50vh;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .skills-section {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .skills-section h2 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .skills-section .section-intro {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .tool-badges {
+    gap: var(--spacing-xs);
+  }
+
+  .tool-badge {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .skill-illustration {
+    min-height: 200px;
+    padding: var(--spacing-lg);
+  }
+
+  .skill-icon {
+    font-size: 5rem;
+  }
+
+  .skills-apply-section {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .skills-apply-section h2 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .apply-content {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .apply-list li {
+    font-size: var(--font-size-base);
+    padding-left: var(--spacing-lg);
   }
 
   .portfolio-grid {
