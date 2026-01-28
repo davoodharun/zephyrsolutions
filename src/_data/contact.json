@@ -1,0 +1,6 @@
+{
+  "emailTemplate": {
+    "subject": "Inquiry from Zephyr Solutions Website",
+    "body": "Hello,\n\nI'd like to discuss how Zephyr Solutions can help my organization.\n\nHere's some information about what I'm looking for:\n\nName: \nOrganization: \nProject Type (e.g., website, web application, cloud infrastructure, automation): \nBrief Description: \nTimeline: \nBudget Range (optional): \nHow did you hear about us? (optional): \n\nThank you!"
+  }
+}

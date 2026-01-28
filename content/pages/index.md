@@ -165,8 +165,8 @@ permalink: /
     
     <div class="contact-content">
       <div class="contact-info">
-        <p><strong>Email:</strong> <a href="mailto:info@zephyrsolutions.com">info@zephyrsolutions.com</a></p>
-        <p><strong>Phone:</strong> +1-555-0123</p>
+        <p><strong>Email:</strong> <a href="{{ globalSettings.contact.email | mailto(contact.emailTemplate.subject, contact.emailTemplate.body) }}">{{ globalSettings.contact.email }}</a></p>
+        <p><strong>Phone:</strong> {{ globalSettings.contact.phone }}</p>
         <p>Have a question? Not sure where to start? That's totally fine! We're happy to have a friendly conversation about what you're working with and how we might be able to help.</p>
       </div>
       <div class="contact-illustration parallax-fg">
@@ -176,7 +176,7 @@ permalink: /
     
     <div class="cta-section">
       <p>Ready to start the conversation?</p>
-      <a href="mailto:info@zephyrsolutions.com" class="button">Get in Touch</a>
+      <a href="{{ globalSettings.contact.email | mailto(contact.emailTemplate.subject, contact.emailTemplate.body) }}" class="button">Get in Touch</a>
     </div>
   </div>
 </section>

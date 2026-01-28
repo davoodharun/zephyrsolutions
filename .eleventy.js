@@ -107,6 +107,23 @@ module.exports = function(eleventyConfig) {
     return array.slice(0, limit || array.length);
   });
 
+  // Add mailto filter to generate pre-populated email links
+  eleventyConfig.addFilter("mailto", function(email, subject, body) {
+    if (!email) return "";
+    let mailtoLink = `mailto:${email}`;
+    const params = [];
+    if (subject) {
+      params.push(`subject=${encodeURIComponent(subject)}`);
+    }
+    if (body) {
+      params.push(`body=${encodeURIComponent(body)}`);
+    }
+    if (params.length > 0) {
+      mailtoLink += `?${params.join("&")}`;
+    }
+    return mailtoLink;
+  });
+
   // Add pathPrefix filter to prefix URLs with the base path
   eleventyConfig.addFilter("base", function(url) {
     if (!url) return "";
