@@ -130,3 +130,14 @@ But for GitHub-connected projects, let Cloudflare handle deployment automaticall
 - **Notion errors**: Verify API key and database ID, check database permissions
 - **Email not sending**: Verify email service API key and sender address
 - **Tokens not working**: Verify `REPORT_TOKEN_SECRET` is set correctly
+
+### Only getting "submission received" email, not the report email
+
+This happens when the **LLM call fails** (e.g. `resource_exhausted`, rate limit, or network error). The handler sends a fallback "thank you, we'll process manually" email and returns 500.
+
+**What to check:**
+
+1. **Cloudflare logs** – Look for `LLM report generation failed:` and the error message. The code now retries up to 3 times with backoff for 429, 5xx, and `resource_exhausted`-style errors.
+2. **LLM provider** – If using OpenAI: check [usage and limits](https://platform.openai.com/usage). If using a proxy/gateway (e.g. Cloudflare AI Gateway): check its quota and that the gateway allows requests from your Pages Function.
+3. **`LLM_API_URL`** – Must be reachable from Cloudflare’s network. Some providers block or throttle datacenter IPs; try the official API URL or a gateway that supports Workers.
+4. **Leads in Notion** – Failed runs mark the lead as `needs_manual_review` so you can process them manually or resubmit after fixing the LLM.

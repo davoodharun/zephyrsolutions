@@ -268,7 +268,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       reportJson = await generateReport(submission, SYSTEM_PROMPT, reportPrompt, env);
       report = JSON.parse(reportJson);
     } catch (error) {
-      console.error('LLM report generation failed:', error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error('LLM report generation failed:', errMsg);
       await markLeadForManualReview(leadId, env);
       // Send fallback email
       await sendEmail(submission.email, {
