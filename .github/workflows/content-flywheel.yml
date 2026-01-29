@@ -94,7 +94,9 @@ jobs:
           OPENAI_API_URL: ${{ vars.OPENAI_API_URL }}
         run: |
           TODAY=$(date +%Y-%m-%d)
-          TITLE="${{ steps.generate.outputs.topic_title }}"
+          TOPIC_TITLE="${{ steps.generate.outputs.topic_title }}"
+          PR_TITLE_JSON=$(printf 'Content: %s' "$TOPIC_TITLE" | jq -Rs .)
+          TITLE="$TOPIC_TITLE"
           SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
           [ -z "$SLUG" ] && SLUG="content"
           BRANCH="content/${TODAY}-${SLUG}"
@@ -148,14 +150,17 @@ jobs:
           fi
           git push origin "$BRANCH"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "pr_title_json<<PR_TITLE_EOF" >> $GITHUB_OUTPUT
+          echo "$PR_TITLE_JSON" >> $GITHUB_OUTPUT
+          echo "PR_TITLE_EOF" >> $GITHUB_OUTPUT
 
       - name: Open PR
         if: steps.write-files.outputs.branch != ''
         uses: actions/github-script@v7
         with:
           script: |
-            const headBranch = context.head_branch;
-            const prTitle = context.pr_title;
+            const headBranch = '${{ steps.write-files.outputs.branch }}';
+            const prTitle = ${{ steps.write-files.outputs.pr_title_json }};
             const repo = await github.rest.repos.get({ owner: context.repo.owner, repo: context.repo.repo });
             const defaultBranch = repo.data.default_branch;
             await github.rest.pulls.create({
@@ -166,5 +171,3 @@ jobs:
               base: defaultBranch,
               body: 'Draft content from Content Flywheel. Review and edit before merging.'
             });
-          head_branch: ${{ steps.write-files.outputs.branch }}
-          pr_title: "Content: ${{ steps.generate.outputs.topic_title }}"
