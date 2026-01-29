@@ -40,6 +40,14 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 - `CONTENT_API_URL`: Base URL of the Pages deployment (e.g. `https://zephyrsolutions.pages.dev`). Defaults to that URL if unset.
 - `OPENAI_API_URL`: Base URL for OpenAI API (defaults to `https://api.openai.com/v1`). Set only if using a proxy or different endpoint.
 
+## Rate limiting
+
+The flywheel makes several LLM calls in one run (1 for topics, then 4 for linkedin/blog/email/onepager). If you hit provider rate limits (e.g. OpenAI RPM):
+
+- **Server-side**: The LLM client retries on 429 (up to 4 attempts), uses a 3s backoff for rate-limit errors, and honors the `Retry-After` header when present. The generate endpoint adds a 1.5s delay between each asset type to avoid bursting.
+- **Workflow**: A 3s pause runs between the topics step and the generate step.
+- **If you still hit limits**: Space out workflow runs (e.g. don’t trigger multiple times in a few minutes), or use a higher API tier / increased rate limits for your key.
+
 ## File path conventions
 
 | Asset type | Path (relative to repo root) |

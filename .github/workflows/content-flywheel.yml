@@ -62,6 +62,9 @@ jobs:
             exit 1
           fi
 
+      - name: Brief pause before generate (reduce rate-limit burst)
+        run: sleep 3
+
       - name: Select first topic and get assets
         id: generate
         env:

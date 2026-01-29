@@ -99,7 +99,14 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
     const systemPrompt = `You are a content strategist for a consultant marketing to small orgs and nonprofits. ${BRAND_SAFETY} Output only valid JSON.`;
 
-    for (const assetType of requestedTypes) {
+    const delayBetweenAssetsMs = 1500; // reduce burst rate-limiting (RPM)
+    async function delay(ms: number): Promise<void> {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    for (let i = 0; i < requestedTypes.length; i++) {
+      const assetType = requestedTypes[i];
+      if (i > 0) await delay(delayBetweenAssetsMs);
       try {
         if (assetType === 'linkedin') {
           const userPrompt = `Topic: ${topicTitle}

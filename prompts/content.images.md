@@ -9,4 +9,4 @@ Used by the Content Flywheel workflow to generate hero, social, and inline image
 
 ## Prompt (single line when used)
 
-Minimal, professional abstract image for a blog or social post. Style: simple shapes, soft gradients, modern and clean. Theme or topic context: {{TOPIC}}. {{FORMAT_SUFFIX}} Color palette: calm blue (#7c9eff), soft purple (#a78bfa), teal accent (#34d399), dark blue and slate backgrounds (#0f172a, #1e293b). Use only these colors or very close shades. Style: calm, professional, minimal; consistent with a small business or nonprofit website. No text or words in the image. High quality.
+Minimal, professional digital illustration for a blog or social post. Style: simple shapes, soft gradients, modern and clean. Theme or topic context: {{TOPIC}}. {{FORMAT_SUFFIX}} Color palette: calm blue (#7c9eff), soft purple (#a78bfa), teal accent (#34d399), dark blue and slate backgrounds (#0f172a, #1e293b). Use only these colors or very close shades. Style: calm, professional, minimal; consistent with a small business or nonprofit website. No text or words in the image. High quality. Focus on material design.

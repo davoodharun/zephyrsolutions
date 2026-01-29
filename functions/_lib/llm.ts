@@ -15,8 +15,9 @@ export interface LLMResponse {
   };
 }
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 4; // one extra for rate limits (429)
 const INITIAL_BACKOFF_MS = 1000;
+const RATE_LIMIT_BACKOFF_MS = 3000; // longer wait for 429
 const LLM_REQUEST_TIMEOUT_MS = 55000; // Under 60s Worker limit
 
 function isRetryableStatus(status: number): boolean {
@@ -77,8 +78,15 @@ async function fetchWithRetry(
       const { code, message, isRetryable } = await parseErrorResponse(response);
       const shouldRetry = isRetryable === true || isRetryableStatus(response.status) || isRetryableErrorCode(code);
       if (attempt < MAX_RETRIES && shouldRetry) {
-        console.warn(`LLM API attempt ${attempt}/${MAX_RETRIES} failed (${response.status} ${code || ''}): ${message}. Retrying in ${backoff}ms...`);
-        await sleep(backoff);
+        let waitMs = response.status === 429 ? RATE_LIMIT_BACKOFF_MS : backoff;
+        const retryAfter = response.headers.get('Retry-After');
+        if (retryAfter) {
+          const seconds = parseInt(retryAfter, 10);
+          if (!Number.isNaN(seconds) && seconds > 0 && seconds <= 120) waitMs = seconds * 1000;
+        }
+        if (response.status === 429) backoff = Math.max(backoff, RATE_LIMIT_BACKOFF_MS);
+        console.warn(`LLM API attempt ${attempt}/${MAX_RETRIES} failed (${response.status} ${code || ''}): ${message}. Retrying in ${waitMs}ms...`);
+        await sleep(waitMs);
         backoff *= 2;
         continue;
       }
