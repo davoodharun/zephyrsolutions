@@ -1,7 +1,7 @@
 ---
 title: Home
 layout: layouts/base
-description: Welcome to Zephyr Solutions - IT Consulting for Smaller Organizations and Non-Profits
+description: Welcome to Zephyr Solutions - Help with computers, websites, and tech for smaller organizations and non-profits
 permalink: /
 ---
 
@@ -12,8 +12,8 @@ permalink: /
     <div class="hero-logo">
       <img src="{{ '/images/zephyr-solutions-logo.png' | base }}" alt="Zephyr Solutions Logo" class="hero-logo-image">
     </div>
-    <p class="hero-subtitle">Making technology work for smaller organizations and non-profits</p>
-    <p class="hero-description">We help organizations navigate technology challenges without the complexity. Think of us as your friendly tech partner who speaks your language—no confusing jargon, just practical solutions.</p>
+    <p class="hero-subtitle">Help with computers, websites, and tech—for smaller organizations and non-profits</p>
+    <p class="hero-description">Not sure where to start with your website, email, or the software your team uses? We're here to help in plain English. No tech jargon, no eye-rolling—just friendly support that actually makes sense.</p>
     <div class="hero-cta-group">
       <a href="{{ '#services' | base }}" class="button hero-cta">See How We Can Help</a>
       <a href="{{ '/health-check/' | base }}" class="button button--secondary hero-cta">Free IT & Web Assessment</a>
@@ -30,9 +30,9 @@ permalink: /
     <h2>About Zephyr Solutions</h2>
     <div class="two-column-content">
       <div class="column-left">
-        <p class="lead">We're here to make technology less scary and more helpful for organizations like yours.</p>
-        <p>Think of us as your friendly tech neighbors who actually understand what it's like to run a smaller organization. We know you're juggling a million things, and technology shouldn't be one of the stressful ones.</p>
-        <p>Our mission is simple: give you the IT help you need without the corporate speak, the huge price tags, or the feeling that you're bothering someone with "dumb questions." (Spoiler: there are no dumb questions!)</p>
+        <p class="lead">We help make the tech side of things less confusing—and more useful—for organizations like yours.</p>
+        <p>We get what it's like to run a small team or non-profit: you're busy, and the last thing you need is someone talking in code words about "systems" and "infrastructure." We speak your language and we're happy to explain things step by step.</p>
+        <p>Our goal is simple: help you with your computers, your website, and your day-to-day tech—without the corporate speak, the huge price tags, or the feeling that you're bothering someone with "silly" questions. (There are no silly questions!)</p>
       </div>
       <div class="column-right parallax-mid">
         <div class="illustration-card">
@@ -48,19 +48,19 @@ permalink: /
   <div class="parallax-bg services-bg"></div>
   <div class="container">
     <h2>What We Do</h2>
-    <p class="section-intro">We specialize in web-based solutions and automation. Starting as a full-stack engineer, we've expanded to handle everything from cloud infrastructure to SaaS migrations. Here's what we can help you with:</p>
+    <p class="section-intro">We help with websites, online tools, and the kind of tech that keeps your organization running. Here’s the kind of stuff we do—all explained in plain language:</p>
     
     <div class="service-item">
       <div class="two-column-content">
         <div class="column-left">
-          <h3>Web Development & Applications</h3>
-          <p>Full-stack web development is where we started, and it's still at the core of what we do. We build modern web applications, websites, and web-based tools that work well and are easy to maintain.</p>
-          <p>Whether you need a new website, a web application for your team, or updates to an existing site, we handle both the front-end (what users see) and back-end (the systems that power it). We work with modern frameworks and tools to build solutions that are fast, secure, and scalable.</p>
-          <p>From simple brochure sites to complex web applications, we create web-based solutions that fit your needs and your budget.</p>
+          <h3>Websites & Online Tools</h3>
+          <p>We build and fix websites—the kind people visit in their browser—and simple online tools your team can use without installing anything.</p>
+          <p>Need a new website, updates to the one you have, or a small tool that runs in the browser (like a form or a simple app)? We handle both what visitors see on the page and the behind-the-scenes setup that makes it work. We keep things running smoothly and secure.</p>
+          <p>From a simple “brochure” site that tells people who you are to something a bit more involved, we build what fits your needs and your budget.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/strategy-background.png' | base }}" alt="Web Development & Applications" class="illustration-image">
+            <img src="{{ '/images/services/strategy-background.png' | base }}" alt="Websites and online tools" class="illustration-image">
           </div>
         </div>
       </div>
@@ -69,14 +69,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content two-column-content--reverse">
         <div class="column-left">
-          <h3>Cloud Infrastructure & Automation</h3>
-          <p>We set up and manage cloud infrastructure, automate deployments, and create infrastructure-as-code solutions that make your systems more reliable and easier to manage.</p>
-          <p>Moving to the cloud or automating your infrastructure doesn't have to be overwhelming. We help you set up cloud services, configure automated deployments, and create scripts and templates that make managing your infrastructure straightforward. This means less manual work, fewer errors, and systems that are easier to update and maintain.</p>
-          <p>Whether you're moving to Azure, setting up CI/CD pipelines, or automating routine tasks, we make cloud infrastructure work for you instead of the other way around.</p>
+          <h3>Online Storage & Letting the Computer Do the Work</h3>
+          <p>We help you use the internet to store files and run your work safely, and we set up ways for boring, repeat tasks to run on their own—so you don’t have to do them by hand every time.</p>
+          <p>“Moving to the cloud” just means using online services instead of a computer in your office. We help you get set up, keep things backed up, and make sure updates happen without you having to think about it. Less clicking, fewer mistakes, and more time for the work that actually matters.</p>
+          <p>Whether you’re switching to something like Microsoft’s online services or just want certain tasks to happen automatically, we make it straightforward instead of overwhelming.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/implementation-background.png' | base }}" alt="Cloud Infrastructure & Automation" class="illustration-image">
+            <img src="{{ '/images/services/implementation-background.png' | base }}" alt="Online storage and automation" class="illustration-image">
           </div>
         </div>
       </div>
@@ -85,14 +85,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content">
         <div class="column-left">
-          <h3>SaaS Setup & On-Prem Migrations</h3>
-          <p>We help you set up web-based SaaS services and migrate from on-premises systems to cloud-based solutions.</p>
-          <p>If you're using software that runs on servers in your office (on-premises), moving to web-based services can save time, reduce maintenance, and give you more flexibility. We help you evaluate options, plan the migration, and handle the technical work of moving your data and processes to new systems.</p>
-          <p>We also help you set up and configure SaaS tools—from project management platforms to customer relationship systems—so they work the way you need them to. The goal is to get you using modern, web-based tools without the headache of managing servers or dealing with outdated software.</p>
+          <h3>Switching to Online Tools (and Leaving Old Setups Behind)</h3>
+          <p>If your data or software still lives on a server or computer in your office, we can help you move it to tools that run in the browser—so you can work from anywhere and spend less time maintaining old equipment.</p>
+          <p>We help you choose the right tools, plan the move, and do the technical part of getting your information and processes into the new system. We also help you set up and get comfortable with things like project management tools and contact databases so they work the way you need.</p>
+          <p>The goal: you use up-to-date, web-based tools without the headache of managing servers or fighting with outdated software.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/integration-background.png' | base }}" alt="SaaS Setup & On-Prem Migrations" class="illustration-image">
+            <img src="{{ '/images/services/integration-background.png' | base }}" alt="Switching to online tools" class="illustration-image">
           </div>
         </div>
       </div>
@@ -101,14 +101,14 @@ permalink: /
     <div class="service-item">
       <div class="two-column-content two-column-content--reverse">
         <div class="column-left">
-          <h3>Automation & Scripting</h3>
-          <p>We automate repetitive tasks and create scripts that save you time and reduce errors.</p>
-          <p>If you find yourself doing the same tasks over and over—moving data between systems, generating reports, updating files, or running routine maintenance—we can automate those processes. We write scripts and set up workflows that handle these tasks automatically, so you can focus on the work that actually needs your attention.</p>
-          <p>Whether it's automating form submissions, syncing data between platforms, or creating custom scripts for your specific needs, we help you work smarter, not harder. The result is less manual work, fewer mistakes, and more time for the things that matter.</p>
+          <h3>Automating Repetitive Tasks</h3>
+          <p>We help you stop doing the same boring steps over and over. If the computer can do it, we set it up so it does.</p>
+          <p>Do you copy data from one place to another every week? Generate the same reports by hand? Update the same files again and again? We set up automated steps so those tasks run on their own. You get fewer mistakes and more time for the work that needs a human.</p>
+          <p>Whether it’s form responses that need to go somewhere, keeping information in sync between different programs, or a custom process for your team, we help you work smarter—not harder.</p>
         </div>
         <div class="column-right parallax-mid">
           <div class="illustration-card">
-            <img src="{{ '/images/services/support-background.png' | base }}" alt="Automation & Scripting" class="illustration-image">
+            <img src="{{ '/images/services/support-background.png' | base }}" alt="Automating repetitive tasks" class="illustration-image">
           </div>
         </div>
       </div>
@@ -120,7 +120,7 @@ permalink: /
 <section id="work" class="section work-section">
   <div class="container">
     <h2>Our Work</h2>
-    <p class="section-intro">See how we've helped organizations like yours use technology more effectively:</p>
+    <p class="section-intro">Here’s how we’ve helped other organizations like yours get more out of their websites and day-to-day tech:</p>
     
     {% for item in collections.portfolio | limit(3) %}
       <div class="portfolio-item">
@@ -164,13 +164,13 @@ permalink: /
   <div class="parallax-bg contact-bg"></div>
   <div class="container">
     <h2>Let's Talk!</h2>
-    <p class="section-intro">We'd love to hear from you. Whether you have a specific project in mind or you're just curious about how we might help, we're here to chat.</p>
+    <p class="section-intro">We’d love to hear from you. Have a specific project in mind, or just a vague feeling that your tech could be better? Either way, we’re happy to chat—no pressure, no jargon.</p>
     
     <div class="contact-content">
       <div class="contact-info">
         <p><strong>Email:</strong> <a href="{{ globalSettings.contact.email | mailto(contact.emailTemplate.subject, contact.emailTemplate.body) }}">{{ globalSettings.contact.email }}</a></p>
         <p><strong>Phone:</strong> {{ globalSettings.contact.phone }}</p>
-        <p>Have a question? Not sure where to start? That's totally fine! We're happy to have a friendly conversation about what you're working with and how we might be able to help.</p>
+        <p>Not sure what you need or how to describe it? That’s okay. We’re used to it. Reach out and we’ll have a friendly conversation about what you’re working with and how we might help.</p>
       </div>
       <div class="contact-illustration parallax-fg">
         <img src="{{ '/images/contact-illustration.png' | base }}" alt="Get in touch - friendly communication" class="contact-image">
