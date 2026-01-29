@@ -142,6 +142,10 @@ jobs:
             exit 0
           fi
           git commit -m "Content: $TITLE"
+          git fetch origin
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git pull origin "$BRANCH" --rebase
+          fi
           git push origin "$BRANCH"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
