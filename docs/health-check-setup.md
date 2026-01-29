@@ -53,8 +53,8 @@ Create a Notion database named "Leads" with the following properties:
 - **Org Size** (Select) - Options: `1-10`, `11-50`, `51-200`, `200+`
 - **Tools** (Multi-select) - Current tools in use
 - **Pain Points** (Multi-select) - Top pain points
-- **Backups** (Select) - Options: `none`, `basic`, `regular`, `automated`, `cloud-based`
-- **Security Confidence** (Select) - Options: `very_low`, `low`, `moderate`, `high`, `very_high`
+- **Backups** (Select) - Options: `none`, `basic`, `regular`, `automated`, `cloud-based`, `not_sure`
+- **Security Confidence** (Select) - Options: `very_low`, `low`, `moderate`, `high`, `very_high`, `not_sure`
 - **Budget Comfort** (Select) - Options: `very_limited`, `limited`, `moderate`, `comfortable`, `flexible`
 - **Timeline** (Select) - Options: `immediate`, `1-3 months`, `3-6 months`, `6-12 months`, `flexible`
 - **Status** (Select) - Options: `pending_generation`, `sent`, `needs_manual_review`
@@ -69,6 +69,10 @@ Create a Notion database named "Leads" with the following properties:
 ### Optional Properties
 
 - **Notes** (Rich text) - Additional notes from form submission
+
+### Optional: Reference list of allowed values
+
+If you need a reference of form field names and allowed values for Notion consistency, filtering, or imports, see **specs/001-health-check-form-rewrite/notion-reference.md**. Notion properties (Tools, Pain Points, Backups, Security Confidence, etc.) are **rich_text**; values are free-form from the form. Use the reference list for consistency when reporting or importing; the form and `schema/healthcheck_submission.schema.json` are the source of truth.
 
 ## Local Development
 

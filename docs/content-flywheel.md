@@ -28,6 +28,8 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 3. The workflow calls the content API (topics → generate), writes markdown files under `content/posts/`, `content/linkedin/`, `content/email/`, `content/onepagers/`, and opens a PR titled **Content: &lt;topic title&gt;**.
 4. Review and edit the PR before merging; no automatic publishing.
 
+**Repository setting (required for PR creation):** In **Settings → Actions → General**, under **Workflow permissions**, enable **Allow GitHub Actions to create and approve pull requests**. Without this, the default `GITHUB_TOKEN` cannot create the draft PR.
+
 **Secrets** (repo Settings → Secrets and variables → Actions):
 
 - `CONTENT_API_SECRET`: Optional; set if you protected the content endpoints with this secret in Cloudflare.

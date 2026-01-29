@@ -73,7 +73,7 @@
       }
     }
 
-    // Required select fields
+    // Required select fields (any non-empty value is valid, including "not_sure" for backups_maturity and security_confidence)
     const requiredSelectFields = ['org_size', 'backups_maturity', 'security_confidence', 'budget_comfort', 'timeline'];
     requiredSelectFields.forEach(fieldName => {
       const field = document.getElementById(fieldName);

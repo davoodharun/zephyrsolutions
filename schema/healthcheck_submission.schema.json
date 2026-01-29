@@ -51,11 +51,11 @@
     },
     "backups_maturity": {
       "type": "string",
-      "enum": ["none", "basic", "regular", "automated", "cloud-based"]
+      "enum": ["none", "basic", "regular", "automated", "cloud-based", "not_sure"]
     },
     "security_confidence": {
       "type": "string",
-      "enum": ["very_low", "low", "moderate", "high", "very_high"]
+      "enum": ["very_low", "low", "moderate", "high", "very_high", "not_sure"]
     },
     "budget_comfort": {
       "type": "string",

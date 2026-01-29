@@ -956,6 +956,13 @@ footer {
   white-space: nowrap;
 }
 
+.hero-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
 .hero-illustration {
   position: absolute;
   top: 50%;

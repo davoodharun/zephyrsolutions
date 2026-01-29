@@ -14,7 +14,10 @@ permalink: /
     </div>
     <p class="hero-subtitle">Making technology work for smaller organizations and non-profits</p>
     <p class="hero-description">We help organizations navigate technology challenges without the complexity. Think of us as your friendly tech partner who speaks your language—no confusing jargon, just practical solutions.</p>
-    <a href="{{ '#services' | base }}" class="button hero-cta">See How We Can Help</a>
+    <div class="hero-cta-group">
+      <a href="{{ '#services' | base }}" class="button hero-cta">See How We Can Help</a>
+      <a href="{{ '/health-check/' | base }}" class="button button--secondary hero-cta">Free IT & Web Assessment</a>
+    </div>
   </div>
   <div class="parallax-fg hero-illustration">
     <img src="{{ '/images/hero-illustration.png' | base }}" alt="Technology innovation" class="hero-illustration-image">
