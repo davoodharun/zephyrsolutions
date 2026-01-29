@@ -17,6 +17,6 @@ LLM_API_URL = "https://api.openai.com/v1"
 # Optional: KV for report fallback (report link works even if Notion update fails)
 # Create namespace: wrangler kv:namespace create HEALTHCHECK_REPORTS
 # Then set id below (or add binding in Pages dashboard: Settings → Functions → KV namespace bindings)
-# [[kv_namespaces]]
-# binding = "HEALTHCHECK_REPORTS_KV"
-# id = "YOUR_NAMESPACE_ID"
+[[kv_namespaces]]
+binding = "HEALTHCHECK_REPORTS_KV"
+id = "51ffb417a9664f83ba3d64e5e2628c52"
