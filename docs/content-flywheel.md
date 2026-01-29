@@ -4,11 +4,11 @@ Content Flywheel generates marketing content (topic ideas + assets) via the cont
 
 ## Environment variables (Cloudflare Pages)
 
-Set in **Pages → Settings → Environment variables** (Production and Preview):
+Set in **Pages → Settings → Environment variables** (Production and Preview). The content API only requires `LLM_API_KEY`; Notion, email, and health-check vars are not needed for the flywheel.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `LLM_API_KEY` | Yes | Same as health check; used for topic and asset generation |
+| `LLM_API_KEY` | Yes | Used for topic and asset generation (OpenAI or compatible API key) |
 | `LLM_API_URL` | No | Defaults to OpenAI-compatible endpoint |
 | `CONTENT_API_SECRET` | No | If set, `POST /api/content/topics` and `POST /api/content/generate` require `Authorization: Bearer <secret>` or `X-Content-API-Secret` |
 

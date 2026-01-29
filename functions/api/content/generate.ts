@@ -4,7 +4,7 @@
  */
 
 import type { Env } from '../../types';
-import { validateEnv } from '../../_lib/env';
+import { validateContentEnv } from '../../_lib/env';
 import { validateAssetGenerationRequest } from '../../_lib/validation-content';
 import { generateContentJson } from '../../_lib/llm';
 
@@ -62,7 +62,7 @@ function dateSlug(): string {
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   const { request, env } = context;
   try {
-    validateEnv(env);
+    validateContentEnv(env);
     if (!checkContentAuth(request, env)) {
       return new Response(
         JSON.stringify({ ok: false, error: 'unauthorized', message: 'Missing or invalid authorization.' }),
@@ -218,9 +218,13 @@ Output a JSON object: { "title": "...", "content": "..." } (content is markdown 
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error('Generate endpoint failed:', msg);
-    return new Response(
-      JSON.stringify({ ok: false, error: 'asset_generation_failed', message: 'Content generation failed. Please try again.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders() } }
-    );
+    const isConfig = /LLM_API_KEY|environment variable/i.test(msg);
+    const body = isConfig
+      ? { ok: false, error: 'content_api_not_configured', message: 'Content API is not configured. Set LLM_API_KEY in Cloudflare Pages environment variables (Production and Preview).' }
+      : { ok: false, error: 'asset_generation_failed', message: 'Content generation failed. Please try again.' };
+    return new Response(JSON.stringify(body), {
+      status: isConfig ? 503 : 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+    });
   }
 };

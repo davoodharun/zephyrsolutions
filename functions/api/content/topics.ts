@@ -4,7 +4,7 @@
  */
 
 import type { Env } from '../../types';
-import { validateEnv } from '../../_lib/env';
+import { validateContentEnv } from '../../_lib/env';
 import { validateTopicSuggestionRequest } from '../../_lib/validation-content';
 import { generateContentJson } from '../../_lib/llm';
 
@@ -59,7 +59,7 @@ export const onRequestOptions = async () => {
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   const { request, env } = context;
   try {
-    validateEnv(env);
+    validateContentEnv(env);
     if (!checkContentAuth(request, env)) {
       return new Response(
         JSON.stringify({ ok: false, error: 'unauthorized', message: 'Missing or invalid authorization.' }),
@@ -107,9 +107,13 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error('Topic generation failed:', msg);
-    return new Response(
-      JSON.stringify({ ok: false, error: 'topic_generation_failed', message: 'Could not generate topics. Please try again.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders() } }
-    );
+    const isConfig = /LLM_API_KEY|environment variable/i.test(msg);
+    const body = isConfig
+      ? { ok: false, error: 'content_api_not_configured', message: 'Content API is not configured. Set LLM_API_KEY in Cloudflare Pages environment variables (Production and Preview).' }
+      : { ok: false, error: 'topic_generation_failed', message: 'Could not generate topics. Please try again.' };
+    return new Response(JSON.stringify(body), {
+      status: isConfig ? 503 : 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders() }
+    });
   }
 };

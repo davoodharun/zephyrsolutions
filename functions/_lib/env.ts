@@ -65,6 +65,16 @@ export function validateEnv(env: Env): void {
 }
 
 /**
+ * Validates only what the Content Flywheel API needs (topics + generate).
+ * Use this in /api/content/* so the flywheel works when only LLM_API_KEY is set.
+ */
+export function validateContentEnv(env: Env): void {
+  if (!env.LLM_API_KEY || (typeof env.LLM_API_KEY === 'string' && env.LLM_API_KEY.trim() === '')) {
+    throw new Error('Missing required environment variable: LLM_API_KEY');
+  }
+}
+
+/**
  * Gets environment variable with optional default
  */
 export function getEnv(key: keyof Env, defaultValue?: string): string {
