@@ -130,6 +130,8 @@ But for GitHub-connected projects, let Cloudflare handle deployment automaticall
 
 **Report normalization (no LLM, no Cloudflare):** From repo root run `npm run test:report` to test that LLM-like JSON (different key names, object-as-array) is normalized and passes validation. This exercises the mapping from raw LLM output to schema shape.
 
+**Notion update in isolation:** If Report JSON is not being saved to Notion (status stays `pending_generation`) but report viewing works via KV, run `npm run test:notion-update -- <leadId>` with a lead ID from your Notion DB (e.g. from an existing row’s Lead ID). The script uses the same `updateNotionLead` logic as the API and prints the exact Notion API error (e.g. property not found, wrong type). Ensure `.env` has `NOTION_API_KEY` and `NOTION_DB_LEADS_ID`.
+
 1. Submit the form at `/health-check/`
 2. Check that a lead is created in Notion with status `pending_generation`
 3. Verify email is received with report link

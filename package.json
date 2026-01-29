@@ -7,7 +7,8 @@
     "build": "eleventy",
     "functions:dev": "wrangler pages dev _site --functions functions",
     "functions:deploy": "wrangler pages deploy _site --project-name=zephyrsolutions",
-    "test:report": "npx tsx scripts/test-report-normalize.ts"
+    "test:report": "npx tsx scripts/test-report-normalize.ts",
+    "test:notion-update": "npx tsx scripts/test-notion-update.ts"
   },
   "keywords": [
     "eleventy",
@@ -28,7 +29,9 @@
     "ajv": "^8.12.0",
     "ajv-formats": "^3.0.1",
     "typescript": "^5.3.3",
-    "wrangler": "^3.19.0"
+    "wrangler": "^3.19.0",
+    "dotenv": "^16.4.0",
+    "tsx": "^4.19.0"
   },
   "dependencies": {}
 }

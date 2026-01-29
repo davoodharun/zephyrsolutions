@@ -45,17 +45,12 @@ function richText(value: string | string[]): { rich_text: Array<{ type: 'text'; 
 
 /**
  * Maps form submission to Notion database properties.
- * Uses rich_text for all text-like columns so the same code works whether
- * your Notion database uses Rich text, Select, or Multi-select.
+ * Uses rich_text for all text-like columns; Email uses Notion's email type.
  */
 function mapSubmissionToNotionProperties(submission: any, status: string): any {
   const now = new Date().toISOString();
   return {
-    'Org Name': {
-      title: [
-        { type: 'text' as const, text: { content: submission.org_name ?? '' } }
-      ]
-    },
+    'Org Name': richText(submission.org_name ?? ''),
     'Contact Name': richText(submission.contact_name ?? ''),
     'Email': {
       email: submission.email ?? ''
@@ -170,9 +165,9 @@ export async function updateNotionLead(
       rich_text: reportJsonChunks
     }
   };
-  // Only set number/select if your Notion DB uses those types; otherwise add as rich_text
+  // Use rich_text so it works whether your Notion DB has Number/Select or Rich text for these
   if (report.readiness_score != null) {
-    updateProperties['Readiness Score'] = { number: report.readiness_score };
+    updateProperties['Readiness Score'] = richText(String(report.readiness_score));
   }
   if (report.readiness_label) {
     updateProperties['Readiness Label'] = richText(report.readiness_label);
