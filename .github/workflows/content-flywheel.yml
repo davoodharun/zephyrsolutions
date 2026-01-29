@@ -105,7 +105,8 @@ jobs:
               *)        continue ;;
             esac
 
-            printf "---\ntitle: %s\ndate: %s\nslug: %s\n---\n\n%s" "$TITLE" "$TODAY" "$SLUG" "$CONTENT" > "${DIR}/${F}"
+            # Write file without printf format to avoid values starting with "-" being treated as options
+            { printf '%s\n' "---" "title: $TITLE" "date: $TODAY" "slug: $SLUG" "---" ""; printf '%s\n' "$CONTENT"; } > "${DIR}/${F}"
           done
 
           git add content/
