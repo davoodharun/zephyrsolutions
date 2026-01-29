@@ -48,12 +48,19 @@ jobs:
             --arg audience "${{ inputs.audience }}" \
             '{ theme: $theme, audience: $audience }')
           if [ -n "$API_SECRET" ]; then
-            RESP=$(curl -s -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -H "Authorization: Bearer $API_SECRET" -d "$BODY")
+            HTTP_CODE=$(curl -s -o topics.json -w "%{http_code}" -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -H "Authorization: Bearer $API_SECRET" -d "$BODY")
           else
-            RESP=$(curl -s -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -d "$BODY")
+            HTTP_CODE=$(curl -s -o topics.json -w "%{http_code}" -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -d "$BODY")
           fi
-          echo "$RESP" > topics.json
-          echo "topics_count=$(echo "$RESP" | jq '.topics | length')" >> $GITHUB_OUTPUT
+          OK=$(jq -r '.ok // false' topics.json)
+          COUNT=$(jq '.topics | length' topics.json)
+          echo "topics_count=$COUNT" >> $GITHUB_OUTPUT
+          if [ "$HTTP_CODE" != "200" ] || [ "$OK" != "true" ] || [ "$COUNT" -eq 0 ]; then
+            echo "Topics API failed (HTTP $HTTP_CODE, ok=$OK, topics_count=$COUNT)"
+            echo "Response:"
+            cat topics.json
+            exit 1
+          fi
 
       - name: Select first topic and get assets
         id: generate
@@ -63,7 +70,8 @@ jobs:
         run: |
           TOPIC=$(jq -c '.topics[0] // empty' topics.json)
           if [ -z "$TOPIC" ] || [ "$TOPIC" = "null" ]; then
-            echo "No topics returned"
+            echo "No topics returned. topics.json:"
+            cat topics.json
             exit 1
           fi
           TITLE=$(echo "$TOPIC" | jq -r '.title')
