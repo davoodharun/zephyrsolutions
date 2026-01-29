@@ -11,6 +11,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-26
 - File-based (existing Markdown/JSON/YAML content files, CSS files) (001-site-redesign)
 - TypeScript (Cloudflare Workers runtime), JavaScript (frontend), Node.js 18+ (local development) + Cloudflare Pages Functions API, Notion API client, Resend/SendGrid SDK, OpenAI-compatible API client, JSON schema validation library (001-ai-health-check)
 - Notion Database (CRM), Cloudflare KV (optional for token storage), Environment variables for secrets (001-ai-health-check)
+- TypeScript (existing repo; align with `functions/` and Eleventy) + Cloudflare Pages Functions, existing LLM integration pattern (see health check), GitHub Actions (001-content-flywheel)
+- Git repo (files written by GitHub Action); no new database for v1. Optional Notion logging is out of scope for v1. (001-content-flywheel)
 
 - Node.js (LTS version, typically 18.x or 20.x) + Eleventy (11ty) static site generator, Node.js package manager (npm/pnpm/yarn) (001-website-scaffold)
 
@@ -31,9 +33,9 @@ tests/
 Node.js (LTS version, typically 18.x or 20.x): Follow standard conventions
 
 ## Recent Changes
+- 001-content-flywheel: Added TypeScript (existing repo; align with `functions/` and Eleventy) + Cloudflare Pages Functions, existing LLM integration pattern (see health check), GitHub Actions
 - 001-ai-health-check: Added TypeScript (Cloudflare Workers runtime), JavaScript (frontend), Node.js 18+ (local development) + Cloudflare Pages Functions API, Notion API client, Resend/SendGrid SDK, OpenAI-compatible API client, JSON schema validation library
 - 001-site-redesign: Added Node.js (LTS 18.x/20.x), CSS3, JavaScript (ES6+ for progressive enhancement) + Eleventy (11ty) static site generator (existing), CSS for styling, minimal JavaScript for parallax effects (requestAnimationFrame, Intersection Observer), no additional frameworks required
-- 003-full-site-implementation: Added Node.js (LTS 18.x/20.x), TypeScript (for TinaCMS config if needed) + Eleventy (11ty) static site generator, TinaCMS (Git-backed CMS), image optimization libraries (sharp or similar), Node.js package manager
 
 
 <!-- MANUAL ADDITIONS START -->

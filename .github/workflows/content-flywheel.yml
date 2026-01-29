@@ -1,0 +1,137 @@
+# Content Flywheel: generate topics + assets via API, write drafts, open PR
+name: Content Flywheel
+
+on:
+  workflow_dispatch:
+    inputs:
+      theme:
+        description: 'Theme / general area (e.g. cybersecurity for nonprofits)'
+        required: true
+        type: string
+      audience:
+        description: 'Target audience / persona (e.g. nonprofit ED, ops manager)'
+        required: true
+        type: string
+      preferred_channels:
+        description: 'Preferred channels (optional, e.g. linkedin,blog,email)'
+        required: false
+        type: string
+        default: 'linkedin,blog,email,onepager'
+      tone:
+        description: 'Tone (optional, e.g. board-friendly)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-and-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get topic suggestions
+        id: topics
+        env:
+          API_URL: ${{ vars.CONTENT_API_URL || 'https://zephyrsolutions.pages.dev' }}
+          API_SECRET: ${{ secrets.CONTENT_API_SECRET }}
+        run: |
+          BODY=$(jq -n \
+            --arg theme "${{ inputs.theme }}" \
+            --arg audience "${{ inputs.audience }}" \
+            '{ theme: $theme, audience: $audience }')
+          if [ -n "$API_SECRET" ]; then
+            RESP=$(curl -s -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -H "Authorization: Bearer $API_SECRET" -d "$BODY")
+          else
+            RESP=$(curl -s -X POST "$API_URL/api/content/topics" -H "Content-Type: application/json" -d "$BODY")
+          fi
+          echo "$RESP" > topics.json
+          echo "topics_count=$(echo "$RESP" | jq '.topics | length')" >> $GITHUB_OUTPUT
+
+      - name: Select first topic and get assets
+        id: generate
+        env:
+          API_URL: ${{ vars.CONTENT_API_URL || 'https://zephyrsolutions.pages.dev' }}
+          API_SECRET: ${{ secrets.CONTENT_API_SECRET }}
+        run: |
+          TOPIC=$(jq -c '.topics[0] // empty' topics.json)
+          if [ -z "$TOPIC" ] || [ "$TOPIC" = "null" ]; then
+            echo "No topics returned"
+            exit 1
+          fi
+          TITLE=$(echo "$TOPIC" | jq -r '.title')
+          BODY=$(jq -n --argjson topic "$TOPIC" '{ topic: $topic, asset_types: ["linkedin","blog","email","onepager"] }')
+          if [ -n "$API_SECRET" ]; then
+            RESP=$(curl -s -X POST "$API_URL/api/content/generate" -H "Content-Type: application/json" -H "Authorization: Bearer $API_SECRET" -d "$BODY")
+          else
+            RESP=$(curl -s -X POST "$API_URL/api/content/generate" -H "Content-Type: application/json" -d "$BODY")
+          fi
+          echo "$RESP" > generate.json
+          echo "topic_title=$TITLE" >> $GITHUB_OUTPUT
+
+      - name: Create branch and write draft files
+        id: write-files
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          TITLE="${{ steps.generate.outputs.topic_title }}"
+          SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+          [ -z "$SLUG" ] && SLUG="content"
+          BRANCH="content/${TODAY}-${SLUG}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+
+          mkdir -p content/posts content/linkedin content/email content/onepagers content/workshops
+          ASSET_COUNT=$(jq '.assets | length' generate.json)
+          for i in $(seq 0 $((ASSET_COUNT - 1))); do
+            TYPE=$(jq -r ".assets[$i].type" generate.json)
+            TITLE=$(jq -r ".assets[$i].title" generate.json)
+            CONTENT=$(jq -r ".assets[$i].content" generate.json)
+            FILENAME=$(jq -r ".assets[$i].suggested_filename" generate.json)
+            SLUG=$(jq -r ".assets[$i].slug" generate.json)
+            VARIANT=$(jq -r ".assets[$i].variant // empty" generate.json)
+
+            case "$TYPE" in
+              blog)     DIR="content/posts";     F="${FILENAME:-${TODAY}-${SLUG}.md}" ;;
+              linkedin) DIR="content/linkedin"; F="${FILENAME:-${TODAY}-${SLUG}-${VARIANT}.md}" ;;
+              email)    DIR="content/email";     F="${FILENAME:-${TODAY}-${SLUG}.md}" ;;
+              onepager) DIR="content/onepagers"; F="${FILENAME:-${TODAY}-${SLUG}.md}" ;;
+              workshop_outline) DIR="content/workshops"; F="${FILENAME:-${TODAY}-${SLUG}.md}" ;;
+              *)        continue ;;
+            esac
+
+            printf "---\ntitle: %s\ndate: %s\nslug: %s\n---\n\n%s" "$TITLE" "$TODAY" "$SLUG" "$CONTENT" > "${DIR}/${F}"
+          done
+
+          git add content/
+          git status
+          if git diff --staged --quiet; then
+            echo "No new files to commit"
+            echo "branch=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          git commit -m "Content: $TITLE"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Open PR
+        if: steps.write-files.outputs.branch != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = '${{ steps.write-files.outputs.branch }}';
+            const repo = await github.rest.repos.get({ owner: context.repo.owner, repo: context.repo.repo });
+            const defaultBranch = repo.data.default_branch;
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Content: ${{ steps.generate.outputs.topic_title }}',
+              head: branch,
+              base: defaultBranch,
+              body: 'Draft content from Content Flywheel. Review and edit before merging.'
+            });

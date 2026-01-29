@@ -104,6 +104,49 @@ async function fetchWithRetry(
 }
 
 /**
+ * Generic LLM call for JSON output (content flywheel: topics, assets).
+ * Uses system + user messages and response_format json_object.
+ */
+export async function generateContentJson(
+  systemPrompt: string,
+  userPrompt: string,
+  env: Env,
+  maxTokens: number = 2000
+): Promise<string> {
+  const apiUrl = env.LLM_API_URL || 'https://api.openai.com/v1';
+  const endpoint = `${apiUrl}/chat/completions`;
+  try {
+    const response = await fetchWithRetry(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.LLM_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+        max_tokens: maxTokens
+      })
+    }, env);
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content;
+    if (!content) throw new Error('No content in LLM response');
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    return jsonMatch ? jsonMatch[0] : content;
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('LLM content generation failed:', msg);
+    throw new Error(`Failed to generate content: ${msg}`);
+  }
+}
+
+/**
  * Calls LLM API to generate report JSON
  */
 export async function generateReport(

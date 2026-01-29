@@ -30,6 +30,9 @@ export interface Env {
 
   // Optional: store reports in KV so report link works even if Notion update fails
   HEALTHCHECK_REPORTS_KV?: KVNamespace;
+
+  // Optional: protect content flywheel endpoints (Bearer or X-Content-API-Secret)
+  CONTENT_API_SECRET?: string;
 }
 
 /**
