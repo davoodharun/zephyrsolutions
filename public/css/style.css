@@ -1752,6 +1752,75 @@ html {
   cursor: not-allowed;
 }
 
+/* Submit progress display */
+.submit-progress {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-surface-variant);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: submit-progress-fade-in 0.25s ease-out;
+}
+
+.submit-progress[hidden] {
+  display: none !important;
+}
+
+@keyframes submit-progress-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.submit-progress__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: var(--spacing-md);
+}
+
+.submit-progress__fill {
+  display: block;
+  height: 100%;
+  width: 40%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  animation: submit-progress-shimmer 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit-progress__fill {
+    animation: none;
+    transform: translateX(0);
+    width: 100%;
+    opacity: 0.7;
+  }
+}
+
+@keyframes submit-progress-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(250%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.submit-progress__message {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
 /* ==========================================================================
    Responsive Design
    ========================================================================== */

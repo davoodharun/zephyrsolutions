@@ -152,6 +152,13 @@ permalink: /health-check/
 
       <div id="form-messages" class="form-messages"></div>
 
+      <div id="submit-progress" class="submit-progress" aria-live="polite" aria-hidden="true" hidden>
+        <div class="submit-progress__bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" role="progressbar">
+          <span class="submit-progress__fill"></span>
+        </div>
+        <p class="submit-progress__message" id="submit-progress-message">Saving your answers…</p>
+      </div>
+
       <button type="submit" class="button" id="submit-button">
         Submit Assessment
       </button>

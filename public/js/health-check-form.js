@@ -9,9 +9,48 @@
   const form = document.getElementById('health-check-form');
   const submitButton = document.getElementById('submit-button');
   const messagesDiv = document.getElementById('form-messages');
+  const progressEl = document.getElementById('submit-progress');
+  const progressMessageEl = document.getElementById('submit-progress-message');
 
   if (!form) {
     return; // Form not on this page
+  }
+
+  const PROGRESS_MESSAGES = [
+    'Saving your answers…',
+    'Building your assessment…',
+    'Reading between the lines…',
+    'Almost there…',
+    'Preparing your personalized report…',
+    'Just a few more seconds…'
+  ];
+
+  let progressMessageInterval = null;
+
+  function showProgress() {
+    if (progressEl && progressMessageEl) {
+      progressEl.hidden = false;
+      progressEl.setAttribute('aria-hidden', 'false');
+      submitButton.style.display = 'none';
+      let i = 0;
+      progressMessageEl.textContent = PROGRESS_MESSAGES[0];
+      progressMessageInterval = setInterval(function() {
+        i = (i + 1) % PROGRESS_MESSAGES.length;
+        progressMessageEl.textContent = PROGRESS_MESSAGES[i];
+      }, 2200);
+    }
+  }
+
+  function hideProgress() {
+    if (progressMessageInterval) {
+      clearInterval(progressMessageInterval);
+      progressMessageInterval = null;
+    }
+    if (progressEl && progressMessageEl) {
+      progressEl.hidden = true;
+      progressEl.setAttribute('aria-hidden', 'true');
+      submitButton.style.display = '';
+    }
   }
 
   /**
@@ -140,15 +179,12 @@
       return;
     }
 
-    // Disable submit button
     submitButton.disabled = true;
-    submitButton.textContent = 'Submitting...';
+    showProgress();
 
-    // Collect form data
     const data = collectFormData();
 
     try {
-      // Submit to API
       const response = await fetch('/api/healthcheck/submit', {
         method: 'POST',
         headers: {
@@ -183,9 +219,8 @@
       console.error('Form submission error:', error);
       showMessage('An error occurred submitting your form. Please try again later.', 'error');
     } finally {
-      // Re-enable submit button
+      hideProgress();
       submitButton.disabled = false;
-      submitButton.textContent = 'Submit Assessment';
     }
   }
 
