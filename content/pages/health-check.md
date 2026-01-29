@@ -7,7 +7,6 @@ permalink: /health-check/
 
 <section class="section health-check-section">
   <div class="container">
-    <h1>Free IT & Web Assessment</h1>
     <p class="section-intro">This free assessment helps you see what kinds of IT and web development support your organization might need. Answer a few questions and we'll send you a personalized summary and recommendations—no jargon, no pressure.</p>
     
     <form id="health-check-form" class="health-check-form">

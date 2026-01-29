@@ -1754,12 +1754,14 @@ html {
 
 /* Submit progress display */
 .submit-progress {
+  display: block;
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
   background: var(--color-surface-variant);
   border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  animation: submit-progress-fade-in 0.25s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: submit-progress-fade-in 0.3s ease-out;
 }
 
 .submit-progress[hidden] {
@@ -1769,16 +1771,18 @@ html {
 @keyframes submit-progress-fade-in {
   from {
     opacity: 0;
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .submit-progress__bar {
-  height: 8px;
+  height: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   overflow: hidden;
   margin-bottom: var(--spacing-md);
 }
@@ -1786,10 +1790,12 @@ html {
 .submit-progress__fill {
   display: block;
   height: 100%;
-  width: 40%;
+  width: 35%;
+  min-width: 80px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  animation: submit-progress-shimmer 1.8s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+  animation: submit-progress-shimmer 1.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1797,28 +1803,28 @@ html {
     animation: none;
     transform: translateX(0);
     width: 100%;
-    opacity: 0.7;
+    opacity: 0.8;
   }
 }
 
 @keyframes submit-progress-shimmer {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(-120%);
   }
   50% {
-    transform: translateX(250%);
+    transform: translateX(320%);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-120%);
   }
 }
 
 .submit-progress__message {
   margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
   text-align: center;
-  transition: opacity 0.2s ease;
+  font-weight: 500;
 }
 
 /* ==========================================================================

@@ -26,19 +26,21 @@
   ];
 
   let progressMessageInterval = null;
+  let progressShownAt = 0;
+  const PROGRESS_MIN_MS = 2200; // Minimum time to show progress so animation is visible
 
   function showProgress() {
-    if (progressEl && progressMessageEl) {
-      progressEl.hidden = false;
-      progressEl.setAttribute('aria-hidden', 'false');
-      submitButton.style.display = 'none';
-      let i = 0;
-      progressMessageEl.textContent = PROGRESS_MESSAGES[0];
-      progressMessageInterval = setInterval(function() {
-        i = (i + 1) % PROGRESS_MESSAGES.length;
-        progressMessageEl.textContent = PROGRESS_MESSAGES[i];
-      }, 2200);
-    }
+    if (!progressEl || !progressMessageEl) return;
+    progressShownAt = Date.now();
+    progressEl.removeAttribute('hidden');
+    progressEl.setAttribute('aria-hidden', 'false');
+    progressEl.style.display = 'block';
+    submitButton.style.display = 'none';
+    progressMessageEl.textContent = PROGRESS_MESSAGES[0];
+    progressMessageInterval = setInterval(function() {
+      var i = Math.floor((Date.now() - progressShownAt) / 2200) % PROGRESS_MESSAGES.length;
+      progressMessageEl.textContent = PROGRESS_MESSAGES[i];
+    }, 2200);
   }
 
   function hideProgress() {
@@ -46,10 +48,19 @@
       clearInterval(progressMessageInterval);
       progressMessageInterval = null;
     }
-    if (progressEl && progressMessageEl) {
-      progressEl.hidden = true;
+    if (!progressEl || !submitButton) return;
+    var elapsed = Date.now() - progressShownAt;
+    var wait = Math.max(0, PROGRESS_MIN_MS - elapsed);
+    function doHide() {
+      progressEl.setAttribute('hidden', '');
       progressEl.setAttribute('aria-hidden', 'true');
+      progressEl.style.display = 'none';
       submitButton.style.display = '';
+    }
+    if (wait > 0) {
+      setTimeout(doHide, wait);
+    } else {
+      doHide();
     }
   }
 
