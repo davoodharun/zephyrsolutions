@@ -35,11 +35,11 @@ function createNotionClient(apiKey: string): Client {
   return new Client({ auth: apiKey });
 }
 
-/** Builds a Notion rich_text property from a string (or array joined by "; ") */
-function richText(value: string | string[]): { rich_text: Array<{ text: { content: string } }> } {
+/** Builds a Notion rich_text property from a string (or array joined by "; "). Notion API requires type: "text". */
+function richText(value: string | string[]): { rich_text: Array<{ type: 'text'; text: { content: string } }> } {
   const content = Array.isArray(value) ? value.join('; ') : (value ?? '');
   return {
-    rich_text: [{ text: { content: content.slice(0, 2000) } }]
+    rich_text: [{ type: 'text', text: { content: content.slice(0, 2000) } }]
   };
 }
 
@@ -53,11 +53,7 @@ function mapSubmissionToNotionProperties(submission: any, status: string): any {
   return {
     'Org Name': {
       title: [
-        {
-          text: {
-            content: submission.org_name ?? ''
-          }
-        }
+        { type: 'text' as const, text: { content: submission.org_name ?? '' } }
       ]
     },
     'Contact Name': richText(submission.contact_name ?? ''),
@@ -94,11 +90,7 @@ export async function createNotionLead(
     ...mapSubmissionToNotionProperties(submission, 'pending_generation'),
     'Lead ID': {
       rich_text: [
-        {
-          text: {
-            content: leadId
-          }
-        }
+        { type: 'text' as const, text: { content: leadId } }
       ]
     }
   };
@@ -107,11 +99,7 @@ export async function createNotionLead(
   if (submission.notes) {
     properties['Notes'] = {
       rich_text: [
-        {
-          text: {
-            content: submission.notes
-          }
-        }
+        { type: 'text' as const, text: { content: submission.notes } }
       ]
     };
   }
@@ -159,12 +147,13 @@ export async function updateNotionLead(
   const pageId = response.results[0].id;
 
   const now = new Date().toISOString();
-  // Notion rich_text has a 2000-char limit per segment; chunk Report JSON so we store the full report
+  // Notion rich_text requires type: "text" and has 2000-char limit per segment; chunk Report JSON
   const reportJsonStr = JSON.stringify(report);
   const chunkSize = 2000;
-  const reportJsonChunks: Array<{ text: { content: string } }> = [];
+  const reportJsonChunks: Array<{ type: 'text'; text: { content: string } }> = [];
   for (let i = 0; i < reportJsonStr.length; i += chunkSize) {
     reportJsonChunks.push({
+      type: 'text',
       text: { content: reportJsonStr.slice(i, i + chunkSize) }
     });
   }
@@ -174,11 +163,7 @@ export async function updateNotionLead(
     'Updated At': richText(now),
     'Report Summary': {
       rich_text: [
-        {
-          text: {
-            content: (report.summary ?? '').slice(0, 2000)
-          }
-        }
+        { type: 'text' as const, text: { content: (report.summary ?? '').slice(0, 2000) } }
       ]
     },
     'Report JSON': {
