@@ -272,8 +272,16 @@ export async function getNotionLead(
     const page = response.results[0];
     const properties = (page as any).properties;
 
-    // Extract report JSON (may be chunked across multiple rich_text segments; Notion limit 2000 chars each)
-    const richTextBlocks = properties['Report JSON']?.rich_text ?? [];
+    // Extract report JSON; try common property name variants (Notion DB may use "Report JSON" or "Report Json")
+    const reportPropNames = ['Report JSON', 'Report Json', 'ReportJSON'];
+    let richTextBlocks: any[] = [];
+    for (const name of reportPropNames) {
+      const prop = properties[name];
+      if (prop?.rich_text) {
+        richTextBlocks = prop.rich_text;
+        break;
+      }
+    }
     const reportJsonStr = richTextBlocks
       .map((b: any) => b?.text?.content ?? '')
       .filter(Boolean)
@@ -282,9 +290,12 @@ export async function getNotionLead(
     if (reportJsonStr) {
       try {
         reportJson = JSON.parse(reportJsonStr);
-      } catch {
+      } catch (e) {
+        console.warn('Report JSON parse failed for lead', leadId, 'length=', reportJsonStr.length, (e as Error)?.message);
         reportJson = null;
       }
+    } else if (Object.keys(properties).length > 0) {
+      console.warn('Report JSON empty for lead', leadId, 'property names:', Object.keys(properties).join(', '));
     }
 
     return {

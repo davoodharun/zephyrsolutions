@@ -53,7 +53,7 @@ Create a Notion database named "Leads" with the following properties:
 - **Readiness Score** (Number) - 1-5
 - **Readiness Label** (Select) - Options: `Watch`, `Plan`, `Act`
 - **Report Summary** (Rich text)
-- **Report JSON** (Rich text) - Full report JSON as string
+- **Report JSON** (Rich text) - Full report JSON; name must be exactly "Report JSON" (or "Report Json" / "ReportJSON" for reading). Required for report links to work.
 - **Source** (Select) - Value: `website-healthcheck`
 - **Created At** (Date)
 - **Updated At** (Date)
@@ -148,3 +148,16 @@ This happens when the **LLM call fails** (e.g. `resource_exhausted`, rate limit,
 3. **LLM provider** – If using OpenAI: check [usage and limits](https://platform.openai.com/usage). If using a proxy/gateway: check its quota and that it allows requests from Cloudflare Workers.
 4. **`LLM_API_URL`** – Must be reachable from Cloudflare’s network. Use `https://api.openai.com/v1` for OpenAI, or leave unset to use that default.
 5. **Leads in Notion** – Failed runs mark the lead as `needs_manual_review` so you can process them manually or resubmit after fixing the LLM.
+
+### Report link returns 404 (report not found)
+
+The report URL works only if the lead’s **Report JSON** was saved to Notion. If the Notion update fails or the property is missing, the link returns 404.
+
+**What to check:**
+
+1. **Cloudflare Real-time Logs** – When you open the report link, look for:
+   - **`Report 404:`** – Shows `leadId`, `leadFound` (true/false), `hasReportJson` (true/false). If `leadFound: true` and `hasReportJson: false`, the lead exists but Report JSON wasn’t saved (update failed or wrong property name).
+   - **`Notion lead update failed:`** – Shown when the submit handler tries to save the report to Notion. The message tells you why (e.g. property not found, invalid type).
+   - **`Report JSON empty for lead ... property names:`** – Lists the lead’s Notion property names so you can confirm whether "Report JSON" (or "Report Json" / "ReportJSON") exists.
+2. **Notion database** – The Leads database must have a **Rich text** property named **"Report JSON"** (exact spelling). The code also reads "Report Json" and "ReportJSON" if present. Create or rename the property if needed.
+3. **Notion API** – Ensure the integration has **edit** access to the database and that the property type is Rich text (not Title, Select, etc.).

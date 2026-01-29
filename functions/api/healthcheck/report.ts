@@ -54,8 +54,9 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
 
     // Fetch lead from Notion
     const lead = await getNotionLead(verification.leadId, env);
-    
+
     if (!lead || !lead.reportJson) {
+      console.warn('Report 404:', { leadId: verification.leadId, leadFound: !!lead, hasReportJson: !!lead?.reportJson });
       return new Response(renderErrorPage('We couldn\'t find the requested report. Please contact us if you need assistance.', env.PUBLIC_BASE_URL), {
         status: 404,
         headers: { 'Content-Type': 'text/html' }

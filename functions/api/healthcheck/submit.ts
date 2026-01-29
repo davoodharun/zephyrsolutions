@@ -336,12 +336,13 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       });
     }
 
-    // Update Notion lead with report data
+    // Update Notion lead with report data (required for report link to work)
     try {
       await updateNotionLead(leadId, report, env);
     } catch (error) {
-      console.error('Notion lead update failed:', error);
-      // Continue - report is generated, just CRM update failed
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error('Notion lead update failed:', leadId, errMsg);
+      // Continue - email still sent; report link will 404 until Notion has "Report JSON" (Rich text) property
     }
 
     // Generate report token
