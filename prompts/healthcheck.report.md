@@ -21,15 +21,18 @@ Analyze this organization's IT situation and produce a HealthCheckReport JSON th
    - "Watch": Monitor but no immediate action needed
    - "Plan": Should develop a plan to address gaps
    - "Act": Take action soon to address risks
-4. **Top Risks**: 2-5 items that pose the greatest risk to the organization
-5. **Top Priorities**: 2-4 items that should be addressed first for maximum impact
-6. **Do Not Worry Yet**: 1-3 items that are acceptable for now but worth monitoring
-7. **Next Steps**: 3-6 concrete, actionable steps the organization can take
-8. **Recommended Entry Offer**: Based on readiness level:
-   - "Free resources" for Watch/Plan organizations
-   - "Fixed-price assessment" for Plan organizations
-   - "Short call" for Act organizations
+4. **Top Risks**: 2-5 items. Each must have a **specific title** (e.g. "Lack of automated backups") and a **concrete description**—never "Risk" or "See assessment."
+5. **Top Priorities**: 2-4 items. Each must have a **specific title and description**—never "Priority" or "See assessment."
+6. **Do Not Worry Yet**: 1-3 items. Each must name a **specific area** and why it's acceptable—never generic "Item" or "Acceptable for now."
+7. **Next Steps**: 3-6 steps. Each must have a **specific title**, description, and realistic timeline—never "Step" or "See assessment." or "Soon" alone.
+8. **Recommended Entry Offer**: One of "free resources", "Fixed-price assessment", or "Short call" based on readiness
 9. **Admin Notes**: Internal notes for the business team about this lead
+
+## Critical: No placeholders
+
+- Do NOT use generic labels as titles: no "Risk", "Priority", "Item", "Step"
+- Do NOT use placeholder text: no "See assessment.", "Acceptable for now.", or "High impact." as the only description
+- Every title and description must be specific to this organization's assessment (their tools, pain points, backups, timeline)
 
 ## Guidelines
 
