@@ -32,9 +32,16 @@ Create an email body that:
 - Acknowledges their specific situation
 - Encourages next steps without pressure
 
+## Sign-off (REQUIRED)
+
+- The email is from **Zephyr Solutions** (the company sending the report).
+- End with a closing like "Warm regards," or "Best regards," followed by exactly **Zephyr Solutions** on the next line.
+- Do NOT use placeholders such as [Your Name], [Your Position], [Your Nonprofit Organization], [Your Contact Information], or any [bracketed] placeholder in the sign-off or anywhere in the email. Use only "Zephyr Solutions" as the sender name.
+
 ## Output Format
 
 Provide the email body text (not HTML, plain text that can be converted to HTML). Include:
 - Subject line suggestion
 - Email body text
 - Keep it concise (3-4 paragraphs max)
+- End with the sign-off above (e.g. "Warm regards,\n\nZephyr Solutions")

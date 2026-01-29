@@ -318,6 +318,17 @@ export async function generateEmailContent(
       body = content;
     }
 
+    // Strip common LLM placeholders from sign-off (never use [Your Name], etc.)
+    const senderName = 'Zephyr Solutions';
+    body = body
+      .replace(/\s*\[\s*Your Name\s*\]\s*/gi, `\n${senderName}\n`)
+      .replace(/\s*\[\s*Your Position\s*\]\s*/gi, '\n')
+      .replace(/\s*\[\s*Your Nonprofit Organization\s*\]\s*/gi, '\n')
+      .replace(/\s*\[\s*Your Contact Information\s*\]\s*/gi, '\n')
+      .replace(/\s*\[\s*Your (?:Organization|Company)\s*\]\s*/gi, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
     return { subject, body };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

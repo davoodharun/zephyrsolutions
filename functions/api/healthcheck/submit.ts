@@ -110,7 +110,7 @@ Readiness: ${report.readiness_score}/5 (${report.readiness_label})
 Summary: ${report.summary}
 Top Priorities: ${report.top_priorities.map((p: any) => p.title).join(', ')}
 
-## Contact Information
+## Contact Information (recipient)
 
 - Organization: ${orgName}
 - Contact: ${contactName}
@@ -126,7 +126,7 @@ Create an email body that:
    - "Watch": Offer free resources, gentle follow-up
    - "Plan": Offer fixed-price assessment, encourage planning conversation
    - "Act": Offer short call, emphasize urgency without being pushy
-5. Includes the report link
+5. Includes the report link in the body (e.g. "You can view your detailed report [here](URL).")
 6. Is warm, non-salesy, and written in plain English
 
 ## Tone
@@ -136,12 +136,18 @@ Create an email body that:
 - Helpful without being pushy
 - Acknowledges their specific situation
 
+## Sign-off (REQUIRED)
+
+- The email is from Zephyr Solutions (the company sending the report).
+- End with a closing like "Warm regards," or "Best regards," followed by exactly: "Zephyr Solutions" on the next line.
+- Do NOT use placeholders such as [Your Name], [Your Position], [Your Nonprofit Organization], [Your Contact Information], or any [bracketed] placeholder in the sign-off or anywhere in the email. Use only "Zephyr Solutions" as the sender name.
+
 ## Output Format
 
 Provide the email in this format:
 Subject: [subject line]
 
-[email body text - 3-4 paragraphs max]`;
+[email body text - 3-4 paragraphs max, ending with the sign-off above]`;
 }
 
 /**
