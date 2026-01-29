@@ -52,3 +52,8 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 | images (hero, social, inline) | `public/images/content-flywheel/YYYY-MM-DD-<slug>-hero.png` (and `-social.png`, `-inline.png`), or `.svg` if OpenAI is not used |
 
 If your site uses a different content tree (e.g. `src/content/`), update the workflow and paths accordingly.
+
+## Image generation and theme alignment
+
+- **DALL-E prompt**: The workflow uses `prompts/content.images.md` for the image generation prompt. It contains placeholders `{{TOPIC}}` and `{{FORMAT_SUFFIX}}`; the OpenAI script (`.github/scripts/generate-flywheel-images-openai.sh`) replaces them and calls the API. The prompt includes the site color palette (calm blue, purple, teal, dark surfaces) so generated images match the site theme.
+- **SVG fallback**: When `OPENAI_API_KEY` is unset or the API fails, `.github/scripts/generate-flywheel-images.sh` creates SVG placeholders using the same palette from `public/css/style.css` (e.g. `#7c9eff`, `#a78bfa`, `#34d399`, `#0f172a`, `#1e293b`).

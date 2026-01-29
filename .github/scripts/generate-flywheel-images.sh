@@ -22,12 +22,12 @@ cat > "${OUT_DIR}/${DATE}-${SLUG}-hero.svg" << EOF
   <title id="hero-title">$TITLE_ESC — hero image</title>
   <defs>
     <linearGradient id="hero-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#7c9eff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect width="800" height="300" fill="url(#hero-grad)"/>
-  <rect x="40" y="40" width="720" height="220" rx="8" fill="rgba(255,255,255,0.12)"/>
+  <rect x="40" y="40" width="720" height="220" rx="8" fill="rgba(15,23,42,0.6)"/>
   <text x="400" y="165" font-family="system-ui,sans-serif" font-size="22" fill="rgba(255,255,255,0.95)" text-anchor="middle">$TITLE_ESC</text>
   <text x="400" y="195" font-family="system-ui,sans-serif" font-size="14" fill="rgba(255,255,255,0.7)" text-anchor="middle">Content Flywheel · $DATE</text>
 </svg>
@@ -39,13 +39,13 @@ cat > "${OUT_DIR}/${DATE}-${SLUG}-social.svg" << EOF
   <title id="social-title">$TITLE_ESC — social share image</title>
   <defs>
     <linearGradient id="social-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4338ca;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect width="800" height="800" fill="url(#social-grad)"/>
-  <circle cx="400" cy="340" r="140" fill="rgba(255,255,255,0.1)"/>
-  <circle cx="400" cy="340" r="100" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="400" cy="340" r="140" fill="rgba(124,158,255,0.15)"/>
+  <circle cx="400" cy="340" r="100" fill="rgba(52,211,153,0.12)"/>
   <text x="400" y="480" font-family="system-ui,sans-serif" font-size="28" fill="rgba(255,255,255,0.95)" text-anchor="middle">$TITLE_ESC</text>
   <text x="400" y="530" font-family="system-ui,sans-serif" font-size="14" fill="rgba(255,255,255,0.6)" text-anchor="middle">$DATE</text>
 </svg>
@@ -57,12 +57,12 @@ cat > "${OUT_DIR}/${DATE}-${SLUG}-inline.svg" << EOF
   <title id="inline-title">$TITLE_ESC — inline image</title>
   <defs>
     <linearGradient id="inline-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.9" />
-      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.9" />
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect width="800" height="400" fill="url(#inline-grad)"/>
-  <rect x="32" y="32" width="736" height="336" rx="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <rect x="32" y="32" width="736" height="336" rx="8" fill="none" stroke="#7c9eff" stroke-width="1" stroke-opacity="0.5"/>
   <text x="400" y="210" font-family="system-ui,sans-serif" font-size="24" fill="rgba(255,255,255,0.95)" text-anchor="middle">$TITLE_ESC</text>
   <text x="400" y="250" font-family="system-ui,sans-serif" font-size="13" fill="rgba(255,255,255,0.65)" text-anchor="middle">Generic placeholder · replace with final asset</text>
 </svg>

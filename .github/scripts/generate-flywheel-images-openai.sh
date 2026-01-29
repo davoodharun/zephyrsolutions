@@ -18,15 +18,28 @@ fi
 mkdir -p "$OUT_DIR"
 API_URL="${OPENAI_API_URL:-https://api.openai.com/v1}/images/generations"
 
-# Safe prompt: minimal, professional, no text in image (topic is for context only)
 # Truncate title for prompt
 TITLE_TRIM=$(printf '%s' "$TITLE" | tr '\n' ' ' | head -c 100)
+
+# Load prompt from prompts/content.images.md (line containing {{TOPIC}}), or use inline fallback
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PROMPT_FILE="${REPO_ROOT}/prompts/content.images.md"
+PROMPT_TEMPLATE=""
+if [ -f "$PROMPT_FILE" ]; then
+  PROMPT_TEMPLATE=$(grep -F '{{TOPIC}}' "$PROMPT_FILE" | head -n1) || true
+fi
+if [ -z "$PROMPT_TEMPLATE" ]; then
+  PROMPT_TEMPLATE="Minimal, professional abstract image for a blog or social post. Style: simple shapes, soft gradients, modern and clean. Theme or topic context: {{TOPIC}}. {{FORMAT_SUFFIX}} Color palette: calm blue (#7c9eff), soft purple (#a78bfa), teal accent (#34d399), dark blue and slate backgrounds (#0f172a, #1e293b). Use only these colors or very close shades. Style: calm, professional, minimal; consistent with a small business or nonprofit website. No text or words in the image. High quality."
+fi
 
 gen_image() {
   local kind=$1
   local size=$2
   local prompt_suffix=$3
-  local prompt="Minimal, professional abstract image for a blog or social post. Style: simple shapes, soft gradients, modern and clean. Theme or topic context: ${TITLE_TRIM}. ${prompt_suffix} No text or words in the image. High quality, suitable for nonprofit or small business content."
+  local prompt
+  prompt="${PROMPT_TEMPLATE//\{\{TOPIC\}\}/$TITLE_TRIM}"
+  prompt="${prompt//\{\{FORMAT_SUFFIX\}\}/$prompt_suffix}"
   local outfile="${OUT_DIR}/${DATE}-${SLUG}-${kind}.png"
 
   local body
