@@ -45,12 +45,16 @@ function richText(value: string | string[]): { rich_text: Array<{ type: 'text'; 
 
 /**
  * Maps form submission to Notion database properties.
- * Uses rich_text for all text-like columns; Email uses Notion's email type.
+ * Org Name uses Notion's title type (primary column); Email uses email type; rest use rich_text.
  */
 function mapSubmissionToNotionProperties(submission: any, status: string): any {
   const now = new Date().toISOString();
   return {
-    'Org Name': richText(submission.org_name ?? ''),
+    'Org Name': {
+      title: [
+        { type: 'text' as const, text: { content: submission.org_name ?? '' } }
+      ]
+    },
     'Contact Name': richText(submission.contact_name ?? ''),
     'Email': {
       email: submission.email ?? ''
