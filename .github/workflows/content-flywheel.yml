@@ -1,4 +1,5 @@
 # Content Flywheel: generate topics + assets via API, write drafts, open PR
+# Optional: Add secret OPENAI_API_KEY to generate 3 images with DALL-E 3; otherwise SVG placeholders are used.
 name: Content Flywheel
 
 on:
@@ -77,6 +78,9 @@ jobs:
 
       - name: Create branch and write draft files
         id: write-files
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_URL: ${{ vars.OPENAI_API_URL }}
         run: |
           TODAY=$(date +%Y-%m-%d)
           TITLE="${{ steps.generate.outputs.topic_title }}"
@@ -88,6 +92,14 @@ jobs:
           git checkout -b "$BRANCH"
 
           mkdir -p content/posts content/linkedin content/email content/onepagers content/workshops
+          # Generate at least 3 image assets: try OpenAI DALL-E 3 first, fall back to SVG placeholders
+          mkdir -p public/images/content-flywheel
+          chmod +x .github/scripts/generate-flywheel-images-openai.sh .github/scripts/generate-flywheel-images.sh 2>/dev/null || true
+          if ./.github/scripts/generate-flywheel-images-openai.sh "$SLUG" "$TODAY" "$TITLE" "public/images/content-flywheel" 2>/dev/null; then
+            echo "Images generated with OpenAI"
+          else
+            ./.github/scripts/generate-flywheel-images.sh "$SLUG" "$TODAY" "$TITLE" "public/images/content-flywheel" || true
+          fi
           ASSET_COUNT=$(jq '.assets | length' generate.json)
           for i in $(seq 0 $((ASSET_COUNT - 1))); do
             TYPE=$(jq -r ".assets[$i].type" generate.json)
@@ -111,6 +123,7 @@ jobs:
           done
 
           git add content/
+          git add public/images/content-flywheel/ 2>/dev/null || true
           git status
           if git diff --staged --quiet; then
             echo "No new files to commit"

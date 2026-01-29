@@ -33,10 +33,12 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 **Secrets** (repo Settings → Secrets and variables → Actions):
 
 - `CONTENT_API_SECRET`: Optional; set if you protected the content endpoints with this secret in Cloudflare.
+- `OPENAI_API_KEY`: Optional; if set, the workflow generates 3 images (hero, social, inline) with DALL-E 3 and saves them as PNGs in `public/images/content-flywheel/`. If unset or the API fails, minimal SVG placeholders are generated instead.
 
 **Variables** (optional):
 
 - `CONTENT_API_URL`: Base URL of the Pages deployment (e.g. `https://zephyrsolutions.pages.dev`). Defaults to that URL if unset.
+- `OPENAI_API_URL`: Base URL for OpenAI API (defaults to `https://api.openai.com/v1`). Set only if using a proxy or different endpoint.
 
 ## File path conventions
 
@@ -47,5 +49,6 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 | email | `content/email/YYYY-MM-DD-<slug>.md` |
 | onepager | `content/onepagers/YYYY-MM-DD-<slug>.md` |
 | workshop_outline | `content/workshops/YYYY-MM-DD-<slug>.md` |
+| images (hero, social, inline) | `public/images/content-flywheel/YYYY-MM-DD-<slug>-hero.png` (and `-social.png`, `-inline.png`), or `.svg` if OpenAI is not used |
 
 If your site uses a different content tree (e.g. `src/content/`), update the workflow and paths accordingly.

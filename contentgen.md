@@ -10,6 +10,7 @@ The feature must:
    - Blog post (600–1200 words)
    - Email newsletter (short)
    - Board-friendly one-pager (executive summary)
+   - at least 3 generated image assets related to the topic (can be generic and minimal)
    - Optional: workshop outline / talk abstract
 
 Primary outcomes:
