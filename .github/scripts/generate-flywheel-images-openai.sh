@@ -30,7 +30,7 @@ if [ -f "$PROMPT_FILE" ]; then
   PROMPT_TEMPLATE=$(grep -F '{{TOPIC}}' "$PROMPT_FILE" | head -n1) || true
 fi
 if [ -z "$PROMPT_TEMPLATE" ]; then
-  PROMPT_TEMPLATE="Minimal, professional abstract image for a blog or social post. Style: simple shapes, soft gradients, modern and clean. Theme or topic context: {{TOPIC}}. {{FORMAT_SUFFIX}} Color palette: calm blue (#7c9eff), soft purple (#a78bfa), teal accent (#34d399), dark blue and slate backgrounds (#0f172a, #1e293b). Use only these colors or very close shades. Style: calm, professional, minimal; consistent with a small business or nonprofit website. No text or words in the image. High quality."
+  PROMPT_TEMPLATE="Do not include any text, letters, words, typography, signs, labels, or writing in the image. Abstract visual only. Minimal, professional digital illustration: simple abstract shapes, soft gradients, modern and clean. Theme or topic context (for mood only, do not depict as text): {{TOPIC}}. {{FORMAT_SUFFIX}} Color palette: calm blue (#7c9eff), soft purple (#a78bfa), teal accent (#34d399), dark blue and slate backgrounds (#0f172a, #1e293b). Use only these colors or very close shades. Purely abstract shapes and gradients—no words, no letters, no text of any kind. High quality."
 fi
 
 gen_image() {
