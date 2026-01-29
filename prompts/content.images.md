@@ -1,8 +1,6 @@
-# Content Flywheel – DALL-E Image Generation Prompt
+# Content Flywheel – Image Generation Prompt
 
-Used by the Content Flywheel workflow to generate hero, social, and inline images that match the site theme. Placeholders are replaced by the OpenAI script before calling the API.
-
-**Note:** DALL-E 3 often adds text even when asked not to. The prompt leads with a strong "no text" rule and repeats it at the end; if images still contain words, consider using the SVG fallback or post-processing/cropping.
+Used by the Content Flywheel workflow to generate hero, social, and inline images that match the site theme. Placeholders are replaced by the OpenAI script before calling the API. The workflow defaults to **GPT Image** (`gpt-image-1`), which follows “no text” instructions better than DALL-E 3; the same OpenAI Image API and key are used by the Cursor MCP image tool (MCP runs only in the IDE; the workflow calls the API directly in CI).
 
 ## Placeholders
 

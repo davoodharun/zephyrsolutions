@@ -39,6 +39,7 @@ See `specs/001-content-flywheel/quickstart.md` for curl examples and `specs/001-
 
 - `CONTENT_API_URL`: Base URL of the Pages deployment (e.g. `https://zephyrsolutions.pages.dev`). Defaults to that URL if unset.
 - `OPENAI_API_URL`: Base URL for OpenAI API (defaults to `https://api.openai.com/v1`). Set only if using a proxy or different endpoint.
+- `IMAGE_MODEL`: Image model for flywheel images. Defaults to `gpt-image-1` (GPT Image; follows “no text” better). Options: `gpt-image-1`, `gpt-image-1.5`, `gpt-image-1-mini`, `dall-e-3`. Set as a **variable** (Settings → Variables) if you want DALL-E 3 instead.
 
 ## Rate limiting
 
@@ -63,5 +64,6 @@ If your site uses a different content tree (e.g. `src/content/`), update the wor
 
 ## Image generation and theme alignment
 
-- **DALL-E prompt**: The workflow uses `prompts/content.images.md` for the image generation prompt. It contains placeholders `{{TOPIC}}` and `{{FORMAT_SUFFIX}}`; the OpenAI script (`.github/scripts/generate-flywheel-images-openai.sh`) replaces them and calls the API. The prompt includes the site color palette (calm blue, purple, teal, dark surfaces) so generated images match the site theme.
+- **OpenAI Image API**: The workflow uses `.github/scripts/generate-flywheel-images-openai.sh`, which calls the same OpenAI Image API used by the Cursor MCP image tool. MCP runs only inside Cursor; GitHub Actions cannot invoke MCP, so the workflow calls the API directly with the same `OPENAI_API_KEY`. The script defaults to **GPT Image** (`gpt-image-1`), which follows “no text” instructions better than DALL-E 3. To use DALL-E 3 instead, set the workflow env var `IMAGE_MODEL=dall-e-3` for the write-files step (or export it before the script runs). Supported values: `gpt-image-1` (default), `gpt-image-1.5`, `gpt-image-1-mini`, `dall-e-3`.
+- **Prompt**: The script reads `prompts/content.images.md` (placeholders `{{TOPIC}}`, `{{FORMAT_SUFFIX}}`) and uses the site color palette so images match the theme.
 - **SVG fallback**: When `OPENAI_API_KEY` is unset or the API fails, `.github/scripts/generate-flywheel-images.sh` creates SVG placeholders using the same palette from `public/css/style.css` (e.g. `#7c9eff`, `#a78bfa`, `#34d399`, `#0f172a`, `#1e293b`).
