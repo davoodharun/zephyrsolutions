@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400" role="img" aria-labelledby="inline-title">
+  <title id="inline-title">Cybersecurity Basics for Nonprofits — inline image</title>
+  <defs>
+    <linearGradient id="inline-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#inline-grad)"/>
+  <rect x="32" y="32" width="736" height="336" rx="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="400" y="210" font-family="system-ui,sans-serif" font-size="24" fill="rgba(255,255,255,0.95)" text-anchor="middle">Cybersecurity Basics for Nonprofits</text>
+  <text x="400" y="250" font-family="system-ui,sans-serif" font-size="13" fill="rgba(255,255,255,0.65)" text-anchor="middle">Generic placeholder · replace with final asset</text>
+</svg>
