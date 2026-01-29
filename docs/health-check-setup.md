@@ -32,6 +32,14 @@ Set the following environment variables in Cloudflare Pages dashboard (**Setting
 - `TURNSTILE_SECRET_KEY`: Cloudflare Turnstile secret key (for enhanced spam protection)
 - `TURNSTILE_SITE_KEY`: Cloudflare Turnstile site key
 
+### Optional: KV namespace for report fallback
+
+If the Notion update fails (e.g. property name/type mismatch), the report link can still work by storing reports in **Cloudflare KV**. The report endpoint checks KV first, then Notion.
+
+1. **Create a KV namespace** (Cloudflare dashboard: **Workers & Pages** → **KV** → **Create namespace**, or CLI: `npx wrangler kv:namespace create HEALTHCHECK_REPORTS`).
+2. **Bind it to your Pages project**: **Pages** → your project → **Settings** → **Functions** → **KV namespace bindings** → **Add binding** → Variable name: `HEALTHCHECK_REPORTS_KV`, KV namespace: select the one you created.
+3. Redeploy. On each successful report generation, the report is stored in KV (90-day TTL) and the report page reads from KV first, so the link works even when Notion doesn’t have the Report JSON.
+
 ## Notion Database Setup
 
 Create a Notion database named "Leads" with the following properties:
@@ -161,3 +169,4 @@ The report URL works only if the lead’s **Report JSON** was saved to Notion. I
    - **`Report JSON empty for lead ... property names:`** – Lists the lead’s Notion property names so you can confirm whether "Report JSON" (or "Report Json" / "ReportJSON") exists.
 2. **Notion database** – The Leads database must have a **Rich text** property named **"Report JSON"** (exact spelling). The code also reads "Report Json" and "ReportJSON" if present. Create or rename the property if needed.
 3. **Notion API** – Ensure the integration has **edit** access to the database and that the property type is Rich text (not Title, Select, etc.).
+4. **Quick fix: use KV fallback** – Bind a KV namespace as `HEALTHCHECK_REPORTS_KV` (see "Optional: KV namespace for report fallback" above). Reports are then stored in KV on submit; the report page reads from KV first, so the link works even when the Notion update fails. You can fix the Notion property name/type later and still serve reports from KV.

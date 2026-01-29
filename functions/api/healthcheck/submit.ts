@@ -342,7 +342,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
       console.error('Notion lead update failed:', leadId, errMsg);
-      // Continue - email still sent; report link will 404 until Notion has "Report JSON" (Rich text) property
+      // Continue - email still sent; report link will work via KV fallback if HEALTHCHECK_REPORTS_KV is bound
+    }
+
+    // Store report in KV so the report link works even if Notion update failed (optional binding)
+    if (env.HEALTHCHECK_REPORTS_KV) {
+      try {
+        await env.HEALTHCHECK_REPORTS_KV.put(leadId, JSON.stringify(report), { expirationTtl: 60 * 60 * 24 * 90 });
+      } catch (kvErr) {
+        console.error('KV report store failed:', leadId, kvErr);
+      }
     }
 
     // Generate report token

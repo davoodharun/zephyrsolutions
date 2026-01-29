@@ -27,6 +27,9 @@ export interface Env {
 
   // Cloudflare KV (optional for rate limiting)
   RATE_LIMIT_KV?: KVNamespace;
+
+  // Optional: store reports in KV so report link works even if Notion update fails
+  HEALTHCHECK_REPORTS_KV?: KVNamespace;
 }
 
 /**

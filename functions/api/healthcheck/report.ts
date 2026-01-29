@@ -52,11 +52,25 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
       });
     }
 
-    // Fetch lead from Notion
-    const lead = await getNotionLead(verification.leadId, env);
+    // Fetch report: try KV first (if bound), then Notion
+    let reportJson: any = null;
+    if (env.HEALTHCHECK_REPORTS_KV) {
+      const kvRaw = await env.HEALTHCHECK_REPORTS_KV.get(verification.leadId);
+      if (kvRaw) {
+        try {
+          reportJson = JSON.parse(kvRaw);
+        } catch (_) {
+          reportJson = null;
+        }
+      }
+    }
+    if (!reportJson) {
+      const lead = await getNotionLead(verification.leadId, env);
+      reportJson = lead?.reportJson ?? null;
+    }
 
-    if (!lead || !lead.reportJson) {
-      console.warn('Report 404:', { leadId: verification.leadId, leadFound: !!lead, hasReportJson: !!lead?.reportJson });
+    if (!reportJson) {
+      console.warn('Report 404:', { leadId: verification.leadId, hasReportJson: false });
       return new Response(renderErrorPage('We couldn\'t find the requested report. Please contact us if you need assistance.', env.PUBLIC_BASE_URL), {
         status: 404,
         headers: { 'Content-Type': 'text/html' }
@@ -64,7 +78,7 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
     }
 
     // Render HTML report
-    const html = renderReportHTML(lead.reportJson, env.PUBLIC_BASE_URL);
+    const html = renderReportHTML(reportJson, env.PUBLIC_BASE_URL);
 
     return new Response(html, {
       status: 200,

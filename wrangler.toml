@@ -14,4 +14,9 @@ LLM_API_URL = "https://api.openai.com/v1"
 # Add other non-sensitive config here, e.g. feature flags, public URLs
 
 # Pages Functions are automatically detected from functions/ directory
-# No additional configuration needed for Pages Functions
+# Optional: KV for report fallback (report link works even if Notion update fails)
+# Create namespace: wrangler kv:namespace create HEALTHCHECK_REPORTS
+# Then set id below (or add binding in Pages dashboard: Settings → Functions → KV namespace bindings)
+# [[kv_namespaces]]
+# binding = "HEALTHCHECK_REPORTS_KV"
+# id = "YOUR_NAMESPACE_ID"

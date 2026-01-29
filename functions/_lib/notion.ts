@@ -183,9 +183,14 @@ export async function updateNotionLead(
       page_id: pageId,
       properties: updateProperties
     });
-  } catch (error) {
-    console.error('Notion API error:', error);
-    throw new Error(`Failed to update Notion lead: ${error}`);
+  } catch (error: unknown) {
+    // Notion SDK errors often have .body with { code, message }; surface for debugging
+    const body = (error as { body?: { code?: string; message?: string } })?.body;
+    const code = body?.code ?? (error as { code?: string })?.code;
+    const msg = body?.message ?? (error instanceof Error ? error.message : String(error));
+    const detail = code ? `[${code}] ${msg}` : msg;
+    console.error('Notion API error:', detail, error);
+    throw new Error(`Failed to update Notion lead: ${detail}`);
   }
 }
 
