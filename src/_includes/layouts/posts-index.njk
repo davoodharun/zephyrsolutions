@@ -2,14 +2,22 @@
 layout: layouts/base
 ---
 <div class="container section">
-  <ul class="posts-list">
+  <div class="posts-grid">
     {% for post in collections.posts %}
-    <li>
-      <a href="{{ post.url | base }}">{{ post.data.title | default('Post') }}</a>
-      {% if post.data.date %}
-      <span class="post-list-date"> — {{ post.data.date | date }}</span>
-      {% endif %}
-    </li>
+    <article class="post-card">
+      <a href="{{ post.url | base }}" class="post-card__link-wrapper">
+        <div class="post-card__content">
+          <h2 class="post-card__title">{{ post.data.title | default('Post') }}</h2>
+          {% if post.data.date %}
+          <p class="post-card__meta"><time datetime="{{ post.data.date | isoDate }}">{{ post.data.date | date }}</time></p>
+          {% endif %}
+          {% if post.data.description %}
+          <p class="post-card__summary">{{ post.data.description }}</p>
+          {% endif %}
+          <span class="post-card__link">Read more</span>
+        </div>
+      </a>
+    </article>
     {% endfor %}
-  </ul>
+  </div>
 </div>
