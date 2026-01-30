@@ -1,0 +1,15 @@
+---
+layout: layouts/base
+---
+<div class="container section">
+  <ul class="posts-list">
+    {% for post in collections.posts %}
+    <li>
+      <a href="{{ post.url | base }}">{{ post.data.title | default('Post') }}</a>
+      {% if post.data.date %}
+      <span class="post-list-date"> — {{ post.data.date | date }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>

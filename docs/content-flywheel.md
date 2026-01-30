@@ -49,6 +49,16 @@ The flywheel makes several LLM calls in one run (1 for topics, then 4 for linked
 - **Workflow**: A 3s pause runs between the topics step and the generate step.
 - **If you still hit limits**: Space out workflow runs (e.g. don’t trigger multiple times in a few minutes), or use a higher API tier / increased rate limits for your key.
 
+## Posts as site pages
+
+Flywheel-generated **blog** posts (saved under `content/posts/`) are published as site pages after merge and deploy. Each post is available at a stable URL:
+
+- **URL pattern**: `/posts/<fileSlug>/` (e.g. `/posts/2026-01-30-harnessing-cloud-solutions-for-nonprofits/`)
+- **Listing**: Optional posts index at `/posts/` lists all non-draft posts with links.
+- **Sitemap**: Non-draft, indexable posts are included in `sitemap.xml` for discovery.
+
+There is no separate manual publish step—the site build renders `content/posts/*.md` at `/posts/<fileSlug>/`; merging the flywheel PR and deploying updates the live site.
+
 ## File path conventions
 
 | Asset type | Path (relative to repo root) |
