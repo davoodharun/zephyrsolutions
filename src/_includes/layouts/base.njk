@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>{% if title %}{{ title }} - {% endif %}{{ globalSettings.siteName | default(site.siteName) }}</title>
-    {% if description %}
-    <meta name="description" content="{{ description }}">
-    {% else %}
-    <meta name="description" content="{{ site.defaultDescription }}">
-    {% endif %}
+    <title>{% if title %}{{ title }} - {{ globalSettings.siteName | default(site.siteName) }}{% else %}{{ globalSettings.siteName | default(site.siteName) }}{% endif %}</title>
+    <meta name="description" content="{{ description | default(globalSettings.defaultSEO.description) | default(site.defaultDescription) }}">
     {% if globalSettings.primaryDomain %}
     <link rel="canonical" href="{{ globalSettings.primaryDomain }}{{ page.url | replace('/index.html', '/') }}">
+    {% endif %}
+    {% if noindex or page.data.noindex %}
+    <meta name="robots" content="noindex, nofollow">
     {% endif %}
     <link rel="stylesheet" href="{{ '/css/style.css' | base }}">
 </head>

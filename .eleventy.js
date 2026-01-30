@@ -42,6 +42,15 @@ module.exports = function(eleventyConfig) {
       .filter(item => !item.data.draft);
   });
 
+  // Indexable pages for sitemap: pages + portfolio (no draft, no noindex)
+  eleventyConfig.addCollection("indexable", function(collectionApi) {
+    const pages = collectionApi.getFilteredByGlob("content/pages/*.md") || [];
+    const portfolio = (collectionApi.getFilteredByGlob("content/portfolio/*.md") || []).filter(p => !p.data.draft);
+    return [...pages, ...portfolio]
+      .filter(p => !p.data.noindex)
+      .sort((a, b) => (a.url || "").localeCompare(b.url || ""));
+  });
+
   // Load global settings
   eleventyConfig.addGlobalData("globalSettings", function() {
     const fs = require("fs");
@@ -97,6 +106,12 @@ module.exports = function(eleventyConfig) {
       return d.getFullYear().toString();
     }
     return d.toLocaleDateString();
+  });
+
+  // ISO date (YYYY-MM-DD) for sitemap lastmod
+  eleventyConfig.addFilter("isoDate", function(date) {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
   });
 
   // Add limit filter for arrays
