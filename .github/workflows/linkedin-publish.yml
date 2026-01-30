@@ -46,6 +46,7 @@ jobs:
           LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
           LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
           LINKEDIN_REFRESH_TOKEN: ${{ secrets.LINKEDIN_REFRESH_TOKEN }}
+          LINKEDIN_REDIRECT_URI: ${{ vars.LINKEDIN_REDIRECT_URI || 'http://localhost:8080/callback' }}
         run: |
           POSTS_JSON='${{ steps.posts.outputs.posts_json }}'
           COMMIT_SHA='${{ github.sha }}'

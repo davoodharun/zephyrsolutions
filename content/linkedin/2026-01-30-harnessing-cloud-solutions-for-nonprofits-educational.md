@@ -10,4 +10,4 @@ With cloud solutions, you can store and access your data from anywhere, making r
 
 Additionally, cloud services often come with built-in security measures to protect sensitive donor and client information. This means you can focus on your work with peace of mind.
 
-If its helpful, I can share a checklist to help you evaluate which cloud solutions might be right for your organization.
+If helpful, I can share a checklist to help you evaluate which cloud solutions might be right for your organization.

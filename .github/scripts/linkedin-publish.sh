@@ -87,7 +87,8 @@ get_access_token() {
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then
     err "LinkedIn auth failed (HTTP $code)"
-    echo "$body" | jq -r '.error_description // .error // .' 2>/dev/null || echo "$body"
+    err "LinkedIn token API response (check error_description):"
+    echo "$body" | jq . 2>/dev/null || echo "$body"
     return 1
   fi
   echo "$body" | jq -r '.access_token'
