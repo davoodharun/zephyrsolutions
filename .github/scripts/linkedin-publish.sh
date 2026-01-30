@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publish LinkedIn posts from content/linkedin/*.md to LinkedIn (UGC Post API + Assets API).
+# Publish LinkedIn posts from content/linkedin/*.md to LinkedIn (Images API + Posts API).
 # Usage: linkedin-publish.sh <posts_json_array> <commit_sha>
 # Example: linkedin-publish.sh '["content/linkedin/2026-01-29-slug-educational.md"]' abc123
 # Requires: either LINKEDIN_ACCESS_TOKEN (use directly) or LINKEDIN_CLIENT_ID + LINKEDIN_CLIENT_SECRET + LINKEDIN_REFRESH_TOKEN (exchange for token).
@@ -10,7 +10,7 @@ REPO_ROOT="${GITHUB_WORKSPACE:-.}"
 STATE_FILE="$REPO_ROOT/content/linkedin/.published.json"
 LINKEDIN_TOKEN_URL="https://www.linkedin.com/oauth/v2/accessToken"
 LINKEDIN_API_BASE="https://api.linkedin.com"
-LINKEDIN_VERSION="202401"  # YYYYMM for rest/assets
+LINKEDIN_VERSION="202601"  # YYYYMM for rest/images and rest/posts
 
 # --- Helpers ---
 log() { echo "[linkedin-publish] $*" >&2; }
@@ -129,25 +129,16 @@ get_person_urn() {
   return 1
 }
 
-# --- Register image upload (Assets API), then upload binary; return asset URN ---
+# --- Upload image via Images API (replaces deprecated Assets API); return image URN ---
 upload_image() {
   local token="$1"
   local person_urn="$2"
   local image_path="$3"
-  local resp code body upload_url asset_urn
+  local resp code body upload_url image_urn status i
 
-  # Register upload (synchronous for feed share image)
-  body=$(jq -n \
-    --arg owner "$person_urn" \
-    '{
-      registerUploadRequest: {
-        owner: $owner,
-        recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-        serviceRelationships: [{ identifier: "urn:li:userGeneratedContent", relationshipType: "OWNER" }],
-        supportedUploadMechanism: ["SYNCHRONOUS_UPLOAD"]
-      }
-    }')
-  resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/rest/assets?action=registerUpload" \
+  # Initialize upload (Images API)
+  body=$(jq -n --arg owner "$person_urn" '{ initializeUploadRequest: { owner: $owner } }')
+  resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/rest/images?action=initializeUpload" \
     -H "Authorization: Bearer $token" \
     -H "Linkedin-Version: $LINKEDIN_VERSION" \
     -H "Content-Type: application/json" \
@@ -156,14 +147,14 @@ upload_image() {
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ] && [ "$code" != "201" ]; then
-    err "Assets registerUpload failed (HTTP $code)"
-    echo "$body" | jq -r '.message // .' 2>/dev/null || echo "$body"
+    err "Images initializeUpload failed (HTTP $code)"
+    printf '%s\n' "$body" | jq . 2>/dev/null || printf '%s\n' "$body"
     return 1
   fi
-  upload_url=$(echo "$body" | jq -r '.value.uploadMechanism["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"].uploadUrl')
-  asset_urn=$(echo "$body" | jq -r '.value.asset')
-  if [ -z "$upload_url" ] || [ "$upload_url" = "null" ] || [ -z "$asset_urn" ] || [ "$asset_urn" = "null" ]; then
-    err "Assets response missing uploadUrl or asset"
+  upload_url=$(echo "$body" | jq -r '.value.uploadUrl')
+  image_urn=$(echo "$body" | jq -r '.value.image')
+  if [ -z "$upload_url" ] || [ "$upload_url" = "null" ] || [ -z "$image_urn" ] || [ "$image_urn" = "null" ]; then
+    err "Images response missing uploadUrl or image"
     return 1
   fi
 
@@ -174,35 +165,50 @@ upload_image() {
     --data-binary "@$image_path") || true
   code=$(echo "$resp" | tail -n1)
   if [ "$code" != "200" ] && [ "$code" != "201" ] && [ "$code" != "204" ]; then
-    err "Image upload failed (HTTP $code)"
+    err "Image binary upload failed (HTTP $code)"
     return 1
   fi
-  echo "$asset_urn"
+
+  # Poll until image is AVAILABLE (Images API is async)
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    sleep 2
+    resp=$(curl -s -w "\n%{http_code}" -X GET "$LINKEDIN_API_BASE/rest/images/$(echo "$image_urn" | jq -sRr @uri)" \
+      -H "Authorization: Bearer $token" \
+      -H "Linkedin-Version: $LINKEDIN_VERSION" \
+      -H "X-Restli-Protocol-Version: 2.0.0") || true
+    code=$(echo "$resp" | tail -n1)
+    body=$(echo "$resp" | sed '$d')
+    status=$(echo "$body" | jq -r '.status // empty')
+    if [ "$code" = "200" ] && [ "$status" = "AVAILABLE" ]; then
+      echo "$image_urn"
+      return
+    fi
+    [ "$status" = "PROCESSING_FAILED" ] && { err "Image processing failed"; return 1; }
+  done
+  err "Image did not become AVAILABLE in time"
+  return 1
 }
 
-# --- Create UGC post (text-only or with image) ---
+# --- Create post via rest/posts (Posts API; supports person author + image URN) ---
 create_ugc_post() {
   local token="$1"
   local person_urn="$2"
   local text="$3"
-  local asset_urn="${4:-}"  # optional; if empty, post is text-only (NONE)
+  local image_urn="${4:-}"  # optional; urn:li:image:xxx from Images API
   local payload
-  if [ -n "$asset_urn" ]; then
+  if [ -n "$image_urn" ]; then
     payload=$(jq -n \
       --arg author "$person_urn" \
       --arg text "$text" \
-      --arg media "$asset_urn" \
+      --arg media "$image_urn" \
       '{
         author: $author,
+        commentary: $text,
+        visibility: "PUBLIC",
+        distribution: { feedDistribution: "MAIN_FEED", targetEntities: [], thirdPartyDistributionChannels: [] },
+        content: { media: { id: $media, altText: "Post image" } },
         lifecycleState: "PUBLISHED",
-        visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" },
-        specificContent: {
-          "com.linkedin.ugc.ShareContent": {
-            shareCommentary: { attributes: [], text: $text },
-            shareMediaCategory: "IMAGE",
-            media: [{ media: $media, status: "READY", title: { attributes: [], text: "Post image" } }]
-          }
-        }
+        isReshareDisabledByAuthor: false
       }')
   else
     payload=$(jq -n \
@@ -210,22 +216,19 @@ create_ugc_post() {
       --arg text "$text" \
       '{
         author: $author,
+        commentary: $text,
+        visibility: "PUBLIC",
+        distribution: { feedDistribution: "MAIN_FEED", targetEntities: [], thirdPartyDistributionChannels: [] },
         lifecycleState: "PUBLISHED",
-        visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" },
-        specificContent: {
-          "com.linkedin.ugc.ShareContent": {
-            shareCommentary: { attributes: [], text: $text },
-            shareMediaCategory: "NONE",
-            media: []
-          }
-        }
+        isReshareDisabledByAuthor: false
       }')
   fi
   local resp code
-  resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/v2/ugcPosts" \
+  resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/rest/posts" \
     -H "Authorization: Bearer $token" \
     -H "Content-Type: application/json" \
     -H "X-Restli-Protocol-Version: 2.0.0" \
+    -H "Linkedin-Version: $LINKEDIN_VERSION" \
     -d "$payload") || true
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
