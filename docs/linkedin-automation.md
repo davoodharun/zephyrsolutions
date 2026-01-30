@@ -16,13 +16,23 @@ Same date+slug in both = same topic/post. See **File path conventions** and **Im
 
 Configure these in **Settings → Secrets and variables → Actions**:
 
+**Option A – Access token (recommended when LinkedIn does not return a refresh token)**  
+Many LinkedIn apps only return an access token (no refresh token). Use the access token directly:
+
+| Secret | Description |
+|--------|-------------|
+| `LINKEDIN_ACCESS_TOKEN` | OAuth 2.0 access token from the get-token script. Valid ~60 days; then re-run `npm run linkedin:get-token` and update this secret. |
+
+**Option B – Refresh token**  
+If your app returns a refresh token when you run the get-token script:
+
 | Secret | Description |
 |--------|-------------|
 | `LINKEDIN_CLIENT_ID` | LinkedIn app Client ID |
 | `LINKEDIN_CLIENT_SECRET` | LinkedIn app Client Secret |
-| `LINKEDIN_REFRESH_TOKEN` | OAuth 2.0 refresh token for the member account that will post (or a long-lived access token) |
+| `LINKEDIN_REFRESH_TOKEN` | OAuth 2.0 refresh token for the member account that will post |
 
-The workflow passes these as environment variables to the publish script. The script never logs token values (FR-007).
+The workflow uses **Option A** when `LINKEDIN_ACCESS_TOKEN` is set; otherwise it uses **Option B**. The script never logs token values (FR-007).
 
 ## LinkedIn app setup
 

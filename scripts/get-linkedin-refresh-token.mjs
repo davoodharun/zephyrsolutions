@@ -90,15 +90,14 @@ const server = createServer(async (req, res) => {
       return;
     }
     res.writeHead(200);
-    res.end('<p><strong>Success!</strong> Check the terminal for your <code>refresh_token</code>. Add it to GitHub Secrets as <code>LINKEDIN_REFRESH_TOKEN</code>.</p>');
-    console.log('\n--- Copy these values ---\n');
-    console.log('LINKEDIN_REFRESH_TOKEN (for GitHub Secrets):');
-    console.log(data.refresh_token || '(not returned)');
-    console.log('\naccess_token (for API calls; expires in ' + (data.expires_in || '?') + ' seconds):');
-    console.log((data.access_token || '').slice(0, 20) + '...');
-    if (data.refresh_token_expires_in) {
-      console.log('\nrefresh_token expires in (seconds):', data.refresh_token_expires_in);
-    }
+    res.end('<p><strong>Success!</strong> Check the terminal. Add <code>LINKEDIN_ACCESS_TOKEN</code> to GitHub Secrets (LinkedIn often does not return a refresh token).</p>');
+    console.log('\n--- Copy to GitHub Secrets ---\n');
+    console.log('LINKEDIN_ACCESS_TOKEN (use this; valid ~60 days, then re-run this script):');
+    console.log(data.access_token || '(missing)');
+    console.log('\nLINKEDIN_REFRESH_TOKEN (only if LinkedIn returned one):');
+    console.log(data.refresh_token || '(not returned by LinkedIn)');
+    if (data.expires_in) console.log('\nAccess token expires in (seconds):', data.expires_in);
+    if (data.refresh_token_expires_in) console.log('Refresh token expires in (seconds):', data.refresh_token_expires_in);
     console.log('\n---\n');
     server.close();
   } catch (e) {

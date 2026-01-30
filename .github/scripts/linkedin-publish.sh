@@ -2,7 +2,7 @@
 # Publish LinkedIn posts from content/linkedin/*.md to LinkedIn (UGC Post API + Assets API).
 # Usage: linkedin-publish.sh <posts_json_array> <commit_sha>
 # Example: linkedin-publish.sh '["content/linkedin/2026-01-29-slug-educational.md"]' abc123
-# Requires: LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, LINKEDIN_REFRESH_TOKEN (env).
+# Requires: either LINKEDIN_ACCESS_TOKEN (use directly) or LINKEDIN_CLIENT_ID + LINKEDIN_CLIENT_SECRET + LINKEDIN_REFRESH_TOKEN (exchange for token).
 # On auth or API failure exits non-zero; does not log tokens (FR-007).
 
 set -euo pipefail
@@ -30,9 +30,11 @@ if [ -z "$COMMIT_SHA" ]; then
   exit 1
 fi
 
-# Require secrets (do not echo values)
-if [ -z "${LINKEDIN_CLIENT_ID:-}" ] || [ -z "${LINKEDIN_CLIENT_SECRET:-}" ] || [ -z "${LINKEDIN_REFRESH_TOKEN:-}" ]; then
-  err "LinkedIn auth failed: missing LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, or LINKEDIN_REFRESH_TOKEN"
+# Require either access token (use directly) or refresh token + client credentials (exchange for token)
+if [ -n "${LINKEDIN_ACCESS_TOKEN:-}" ]; then
+  : # Use LINKEDIN_ACCESS_TOKEN directly; no client_id/secret/refresh needed
+elif [ -z "${LINKEDIN_CLIENT_ID:-}" ] || [ -z "${LINKEDIN_CLIENT_SECRET:-}" ] || [ -z "${LINKEDIN_REFRESH_TOKEN:-}" ]; then
+  err "LinkedIn auth failed: set LINKEDIN_ACCESS_TOKEN, or set LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, and LINKEDIN_REFRESH_TOKEN"
   exit 1
 fi
 
@@ -86,9 +88,13 @@ get_access_token() {
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then
-    err "LinkedIn auth failed (HTTP $code)"
-    err "LinkedIn token API response (check error_description):"
-    echo "$body" | jq . 2>/dev/null || echo "$body"
+    err "LinkedIn auth failed (HTTP $code). Response body length: ${#body} bytes."
+    if [ -z "$body" ]; then
+      err "Response body was empty. Check client_id, client_secret, refresh_token, and redirect_uri."
+    else
+      err "LinkedIn token API response:"
+      printf '%s\n' "$body" | jq . 2>/dev/null || printf '%s\n' "$body"
+    fi
     return 1
   fi
   echo "$body" | jq -r '.access_token'
@@ -235,7 +241,12 @@ post_body_text() {
 }
 
 # --- Main ---
-ACCESS_TOKEN=$(get_access_token) || exit 1
+if [ -n "${LINKEDIN_ACCESS_TOKEN:-}" ]; then
+  ACCESS_TOKEN="$LINKEDIN_ACCESS_TOKEN"
+  log "Using provided LINKEDIN_ACCESS_TOKEN (expires in ~60 days; re-run get-token script to refresh)."
+else
+  ACCESS_TOKEN=$(get_access_token) || exit 1
+fi
 PERSON_URN=$(get_person_urn "$ACCESS_TOKEN") || exit 1
 log "Publishing as $PERSON_URN"
 
