@@ -31,7 +31,10 @@ jobs:
             echo "No .md post files changed; nothing to publish."
             exit 0
           fi
-          echo "$POSTS" | jq -R -s -c 'split("\n") | map(select(length > 0))' >> "$GITHUB_OUTPUT"
+          POSTS_JSON=$(echo "$POSTS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "posts_json<<OUT" >> "$GITHUB_OUTPUT"
+          echo "$POSTS_JSON" >> "$GITHUB_OUTPUT"
+          echo "OUT" >> "$GITHUB_OUTPUT"
           echo "Post files to consider:"
           echo "$POSTS"
 
