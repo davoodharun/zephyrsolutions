@@ -18,13 +18,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: List changed LinkedIn post files
         id: posts
         run: |
           # Only consider .md files under content/linkedin/ (exclude .published.json)
-          CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- content/linkedin/ 2>/dev/null || true)
+          BEFORE="${{ github.event.before }}"
+          SHA="${{ github.sha }}"
+          CHANGED=$(git diff --name-only "$BEFORE" "$SHA" -- content/linkedin/ 2>/dev/null || true)
           POSTS=$(echo "$CHANGED" | grep -E '^content/linkedin/.+\.md$' || true)
           if [ -z "$POSTS" ]; then
             echo "posts_json=[]" >> "$GITHUB_OUTPUT"
