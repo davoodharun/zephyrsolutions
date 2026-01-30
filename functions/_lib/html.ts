@@ -169,7 +169,10 @@ export function renderReportHTML(report: HealthCheckReport, baseUrl: string = ''
     <div class="report-section">
       <h2>Recommended Next Step</h2>
       <p>Based on your assessment, we recommend: <strong>${escapeHtml(report.recommended_entry_offer)}</strong></p>
-      <p><a href="${baseUrl}/#contact" class="button">Get in Touch</a></p>
+      <p>
+        <a href="${baseUrl}/#contact" class="button">Get in Touch</a>
+        <a href="https://calendly.com/davoodharun/tfi" class="button button--secondary" target="_blank" rel="noopener noreferrer" style="margin-left: var(--spacing-md);">Book a Call</a>
+      </p>
     </div>
   </div>
 </body>

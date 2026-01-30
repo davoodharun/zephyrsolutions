@@ -1,11 +1,9 @@
-# Publish LinkedIn posts on push to main when content/linkedin/** changes.
-# Only *.md files under content/linkedin/ are published; .published.json changes do not republish.
+# Publish LinkedIn posts. Trigger disabled for now (publishing will use company page when access is ready).
+# Run manually via Actions → LinkedIn Publish → Run workflow.
 name: LinkedIn Publish
 
 on:
-  push:
-    branches: [main]
-    paths: ['content/linkedin/**']
+  workflow_dispatch:
 
 permissions:
   contents: write  # read + write (needed to commit .published.json)
@@ -20,24 +18,40 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: List changed LinkedIn post files
+      - name: List LinkedIn post files to publish
         id: posts
         run: |
-          # Only consider .md files under content/linkedin/ (exclude .published.json)
-          BEFORE="${{ github.event.before }}"
-          SHA="${{ github.sha }}"
-          CHANGED=$(git diff --name-only "$BEFORE" "$SHA" -- content/linkedin/ 2>/dev/null || true)
-          POSTS=$(echo "$CHANGED" | grep -E '^content/linkedin/.+\.md$' || true)
+          # Manual run: list all .md under content/linkedin/ that are not in .published.json (unpublished).
+          # Push run (if re-enabled): list .md files changed in the push.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ALL_POSTS=$(find content/linkedin -maxdepth 1 -name "*.md" 2>/dev/null | sort || true)
+            if [ ! -f content/linkedin/.published.json ]; then
+              POSTS="$ALL_POSTS"
+            else
+              POSTS=""
+              while IFS= read -r p; do
+                [ -z "$p" ] && continue
+                if ! jq -e --arg path "$p" '.[$path] != null' content/linkedin/.published.json 2>/dev/null; then
+                  POSTS="${POSTS}${POSTS:+$'\n'}$p"
+                fi
+              done <<< "$ALL_POSTS"
+            fi
+          else
+            BEFORE="${{ github.event.before }}"
+            SHA="${{ github.sha }}"
+            CHANGED=$(git diff --name-only "$BEFORE" "$SHA" -- content/linkedin/ 2>/dev/null || true)
+            POSTS=$(echo "$CHANGED" | grep -E '^content/linkedin/.+\.md$' || true)
+          fi
           if [ -z "$POSTS" ]; then
             echo "posts_json=[]" >> "$GITHUB_OUTPUT"
-            echo "No .md post files changed; nothing to publish."
+            echo "No .md post files to publish."
             exit 0
           fi
           POSTS_JSON=$(echo "$POSTS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "posts_json<<OUT" >> "$GITHUB_OUTPUT"
           echo "$POSTS_JSON" >> "$GITHUB_OUTPUT"
           echo "OUT" >> "$GITHUB_OUTPUT"
-          echo "Post files to consider:"
+          echo "Post files to publish:"
           echo "$POSTS"
 
       - name: Publish to LinkedIn

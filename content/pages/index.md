@@ -17,6 +17,7 @@ permalink: /
     <div class="hero-cta-group">
       <a href="{{ '#services' | base }}" class="button hero-cta">See How We Can Help</a>
       <a href="{{ '/health-check/' | base }}" class="button button--secondary hero-cta">Free IT & Web Assessment</a>
+      <a href="https://calendly.com/davoodharun/tfi" class="button button--secondary hero-cta" target="_blank" rel="noopener noreferrer">Book a Call</a>
     </div>
   </div>
   <div class="parallax-fg hero-illustration">
@@ -170,7 +171,7 @@ permalink: /
       <div class="contact-info">
         <p><strong>Email:</strong> <a href="{{ globalSettings.contact.email | mailto(contact.emailTemplate.subject, contact.emailTemplate.body) }}">{{ globalSettings.contact.email }}</a></p>
         <p><strong>Phone:</strong> {{ globalSettings.contact.phone }}</p>
-        <p>Not sure what you need or how to describe it? That’s okay. We’re used to it. Reach out and we’ll have a friendly conversation about what you’re working with and how we might help.</p>
+        <p>Not sure what you need or how to describe it? <a href="https://calendly.com/davoodharun/tfi" target="_blank" rel="noopener noreferrer">Schedule a call</a> or reach out. That’s okay. We’re used to it. Reach out and we’ll have a friendly conversation about what you’re working with and how we might help.</p>
       </div>
       <div class="contact-illustration parallax-fg">
         <img src="{{ '/images/contact-illustration.png' | base }}" alt="Get in touch - friendly communication" class="contact-image">
@@ -180,6 +181,7 @@ permalink: /
     <div class="cta-section">
       <p>Ready to start the conversation?</p>
       <a href="{{ globalSettings.contact.email | mailto(contact.emailTemplate.subject, contact.emailTemplate.body) }}" class="button">Get in Touch</a>
+      <a href="https://calendly.com/davoodharun/tfi" class="button button--secondary" target="_blank" rel="noopener noreferrer">Book a Call</a>
     </div>
   </div>
 </section>
