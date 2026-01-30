@@ -19,6 +19,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-26
 - Git (content files, image files); no new database. (001-linkedin-automation)
 - JavaScript (Node) — existing Eleventy 11ty project + Eleventy (existing), no new runtime dependencies required for sitemap/robots generation (004-site-discovery-seo)
 - N/A (static build output; submission state is external in Google Search Console) (004-site-discovery-seo)
+- JavaScript (Node) — existing Eleventy 11ty project + Eleventy (existing); content flywheel already writes to content/posts/ (005-flywheel-posts-pages)
+- N/A (static content in repo; build output in _site) (005-flywheel-posts-pages)
 
 - Node.js (LTS version, typically 18.x or 20.x) + Eleventy (11ty) static site generator, Node.js package manager (npm/pnpm/yarn) (001-website-scaffold)
 
@@ -39,9 +41,9 @@ tests/
 Node.js (LTS version, typically 18.x or 20.x): Follow standard conventions
 
 ## Recent Changes
+- 005-flywheel-posts-pages: Added JavaScript (Node) — existing Eleventy 11ty project + Eleventy (existing); content flywheel already writes to content/posts/
 - 004-site-discovery-seo: Added JavaScript (Node) — existing Eleventy 11ty project + Eleventy (existing), no new runtime dependencies required for sitemap/robots generation
 - 001-linkedin-automation: Added Bash (workflows), Node/TypeScript optional for LinkedIn API client (or curl + jq). + GitHub Actions; LinkedIn API (UGC Post API, Assets API for image upload); OAuth 2.0 for LinkedIn app.
-- 001-health-check-form-rewrite: Added TypeScript (Cloudflare Functions), JavaScript (form), Markdown/Nunjucks (content) + Eleventy, Cloudflare Pages Functions, @notionhq/client, existing healthcheck submit/report API
 
 
 <!-- MANUAL ADDITIONS START -->

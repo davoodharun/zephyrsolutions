@@ -42,11 +42,20 @@ module.exports = function(eleventyConfig) {
       .filter(item => !item.data.draft);
   });
 
-  // Indexable pages for sitemap: pages + portfolio (no draft, no noindex)
+  // Add posts collection from content/posts/ (exclude draft), reverse chronological
+  eleventyConfig.addCollection("posts", function(collectionApi) {
+    return (collectionApi.getFilteredByGlob("content/posts/*.md") || [])
+      .filter(p => !p.data.draft && p.fileSlug !== "index")
+      .sort((a, b) => (new Date(b.data.date || 0)) - (new Date(a.data.date || 0)));
+  });
+
+  // Indexable pages for sitemap: pages + portfolio + posts (no draft, no noindex)
   eleventyConfig.addCollection("indexable", function(collectionApi) {
     const pages = collectionApi.getFilteredByGlob("content/pages/*.md") || [];
     const portfolio = (collectionApi.getFilteredByGlob("content/portfolio/*.md") || []).filter(p => !p.data.draft);
-    return [...pages, ...portfolio]
+    const posts = (collectionApi.getFilteredByGlob("content/posts/*.md") || [])
+      .filter(p => !p.data.draft && !p.data.noindex && p.fileSlug !== "index");
+    return [...pages, ...portfolio, ...posts]
       .filter(p => !p.data.noindex)
       .sort((a, b) => (a.url || "").localeCompare(b.url || ""));
   });
