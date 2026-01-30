@@ -71,6 +71,9 @@ resolve_image() {
 }
 
 # --- Get access token from refresh token ---
+# redirect_uri must match the one used when the refresh token was obtained (e.g. from get-linkedin-refresh-token.mjs).
+LINKEDIN_REDIRECT_URI="${LINKEDIN_REDIRECT_URI:-http://localhost:8080/callback}"
+
 get_access_token() {
   local resp code
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_TOKEN_URL" \
@@ -78,7 +81,8 @@ get_access_token() {
     -d "grant_type=refresh_token" \
     -d "refresh_token=$LINKEDIN_REFRESH_TOKEN" \
     -d "client_id=$LINKEDIN_CLIENT_ID" \
-    -d "client_secret=$LINKEDIN_CLIENT_SECRET") || true
+    -d "client_secret=$LINKEDIN_CLIENT_SECRET" \
+    -d "redirect_uri=$LINKEDIN_REDIRECT_URI") || true
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then

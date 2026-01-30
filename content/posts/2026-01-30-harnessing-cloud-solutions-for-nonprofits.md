@@ -1,5 +1,5 @@
 ---
-title: Harnessing Cloud Solutions for Nonprofits: Streamline Your Operations
+title: Harnessing Cloud Solutions for Nonprofits Streamline Your Operations
 date: 2026-01-30
 slug: harnessing-cloud-solutions-for-nonprofits
 ---
