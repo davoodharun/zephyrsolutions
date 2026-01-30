@@ -101,19 +101,32 @@ get_access_token() {
 }
 
 # --- Get person URN (author) ---
+# Try OpenID Connect userinfo first (works with openid+profile scope); fall back to /v2/me.
 get_person_urn() {
   local token="$1"
-  local resp code
+  local resp code body sub
+  resp=$(curl -s -w "\n%{http_code}" -X GET "$LINKEDIN_API_BASE/v2/userinfo" \
+    -H "Authorization: Bearer $token") || true
+  code=$(echo "$resp" | tail -n1)
+  body=$(echo "$resp" | sed '$d')
+  if [ "$code" = "200" ]; then
+    sub=$(echo "$body" | jq -r '.sub')
+    if [ -n "$sub" ] && [ "$sub" != "null" ]; then
+      echo "urn:li:person:$sub"
+      return
+    fi
+  fi
   resp=$(curl -s -w "\n%{http_code}" -X GET "$LINKEDIN_API_BASE/v2/me" \
     -H "Authorization: Bearer $token" \
     -H "X-Restli-Protocol-Version: 2.0.0") || true
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
-  if [ "$code" != "200" ]; then
-    err "Failed to get person URN (HTTP $code)"
-    return 1
+  if [ "$code" = "200" ]; then
+    echo "$body" | jq -r '.id'
+    return
   fi
-  echo "$body" | jq -r '.id'
+  err "Failed to get person URN (tried /v2/userinfo and /v2/me). Request openid+profile scope when getting the token (npm run linkedin:get-token)."
+  return 1
 }
 
 # --- Register image upload (Assets API), then upload binary; return asset URN ---

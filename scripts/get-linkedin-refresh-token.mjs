@@ -19,7 +19,7 @@ import { platform } from 'os';
 
 const PORT = 8080;
 const REDIRECT_URI = `http://localhost:${PORT}/callback`;
-const SCOPE = 'w_member_social';
+const SCOPE = 'w_member_social openid profile';
 const AUTH_URL = 'https://www.linkedin.com/oauth/v2/authorization';
 const TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken';
 
