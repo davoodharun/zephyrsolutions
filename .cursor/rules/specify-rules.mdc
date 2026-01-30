@@ -15,6 +15,8 @@ Auto-generated from all feature plans. Last updated: 2026-01-26
 - Git repo (files written by GitHub Action); no new database for v1. Optional Notion logging is out of scope for v1. (001-content-flywheel)
 - TypeScript (Cloudflare Functions), JavaScript (form), Markdown/Nunjucks (content) + Eleventy, Cloudflare Pages Functions, @notionhq/client, existing healthcheck submit/report API (001-health-check-form-rewrite)
 - Notion (lead database); optional KV for report fallback (existing) (001-health-check-form-rewrite)
+- Bash (workflows), Node/TypeScript optional for LinkedIn API client (or curl + jq). + GitHub Actions; LinkedIn API (UGC Post API, Assets API for image upload); OAuth 2.0 for LinkedIn app. (001-linkedin-automation)
+- Git (content files, image files); no new database. (001-linkedin-automation)
 
 - Node.js (LTS version, typically 18.x or 20.x) + Eleventy (11ty) static site generator, Node.js package manager (npm/pnpm/yarn) (001-website-scaffold)
 
@@ -35,9 +37,9 @@ tests/
 Node.js (LTS version, typically 18.x or 20.x): Follow standard conventions
 
 ## Recent Changes
+- 001-linkedin-automation: Added Bash (workflows), Node/TypeScript optional for LinkedIn API client (or curl + jq). + GitHub Actions; LinkedIn API (UGC Post API, Assets API for image upload); OAuth 2.0 for LinkedIn app.
 - 001-health-check-form-rewrite: Added TypeScript (Cloudflare Functions), JavaScript (form), Markdown/Nunjucks (content) + Eleventy, Cloudflare Pages Functions, @notionhq/client, existing healthcheck submit/report API
 - 001-content-flywheel: Added TypeScript (existing repo; align with `functions/` and Eleventy) + Cloudflare Pages Functions, existing LLM integration pattern (see health check), GitHub Actions
-- 001-ai-health-check: Added TypeScript (Cloudflare Workers runtime), JavaScript (frontend), Node.js 18+ (local development) + Cloudflare Pages Functions API, Notion API client, Resend/SendGrid SDK, OpenAI-compatible API client, JSON schema validation library
 
 
 <!-- MANUAL ADDITIONS START -->

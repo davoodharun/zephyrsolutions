@@ -67,3 +67,13 @@ If your site uses a different content tree (e.g. `src/content/`), update the wor
 - **OpenAI Image API**: The workflow uses `.github/scripts/generate-flywheel-images-openai.sh`, which calls the same OpenAI Image API used by the Cursor MCP image tool. MCP runs only inside Cursor; GitHub Actions cannot invoke MCP, so the workflow calls the API directly with the same `OPENAI_API_KEY`. The script defaults to **GPT Image** (`gpt-image-1`), which follows “no text” instructions better than DALL-E 3. To use DALL-E 3 instead, set the workflow env var `IMAGE_MODEL=dall-e-3` for the write-files step (or export it before the script runs). Supported values: `gpt-image-1` (default), `gpt-image-1.5`, `gpt-image-1-mini`, `dall-e-3`.
 - **Prompt**: The script reads `prompts/content.images.md` (placeholders `{{TOPIC}}`, `{{FORMAT_SUFFIX}}`) and uses the site color palette so images match the theme.
 - **SVG fallback**: When `OPENAI_API_KEY` is unset or the API fails, `.github/scripts/generate-flywheel-images.sh` creates SVG placeholders using the same palette from `public/css/style.css` (e.g. `#7c9eff`, `#a78bfa`, `#34d399`, `#0f172a`, `#1e293b`).
+
+## Image and post association
+
+Images are tied to posts by **date and slug** in filenames. For a LinkedIn post file `content/linkedin/YYYY-MM-DD-<slug>-<variant>.md`, the matching images live under:
+
+- `public/images/content-flywheel/YYYY-MM-DD-<slug>-hero.png`
+- `public/images/content-flywheel/YYYY-MM-DD-<slug>-social.png`
+- `public/images/content-flywheel/YYYY-MM-DD-<slug>-inline.png`
+
+The **social** image is preferred for LinkedIn (square/feed-friendly). The LinkedIn publish workflow uses this convention to attach the right image to each post; if no image exists for a post, the post is published as text-only.
