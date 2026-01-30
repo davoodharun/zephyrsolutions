@@ -169,24 +169,10 @@ upload_image() {
     return 1
   fi
 
-  # Poll until image is AVAILABLE (Images API is async)
-  for i in 1 2 3 4 5 6 7 8 9 10; do
-    sleep 2
-    resp=$(curl -s -w "\n%{http_code}" -X GET "$LINKEDIN_API_BASE/rest/images/$(echo "$image_urn" | jq -sRr @uri)" \
-      -H "Authorization: Bearer $token" \
-      -H "Linkedin-Version: $LINKEDIN_VERSION" \
-      -H "X-Restli-Protocol-Version: 2.0.0") || true
-    code=$(echo "$resp" | tail -n1)
-    body=$(echo "$resp" | sed '$d')
-    status=$(echo "$body" | jq -r '.status // empty')
-    if [ "$code" = "200" ] && [ "$status" = "AVAILABLE" ]; then
-      echo "$image_urn"
-      return
-    fi
-    [ "$status" = "PROCESSING_FAILED" ] && { err "Image processing failed"; return 1; }
-  done
-  err "Image did not become AVAILABLE in time"
-  return 1
+  # w_member_social is write-only for Images API: we cannot GET status. Give LinkedIn time to process, then create the post.
+  log "Image uploaded; waiting 15s for processing before creating post."
+  sleep 15
+  echo "$image_urn"
 }
 
 # --- Create post via rest/posts (Posts API; supports person author + image URN) ---
