@@ -4,7 +4,7 @@ date: 2026-01-30
 slug: harnessing-cloud-solutions-for-nonprofits
 ---
 
-Here are some key questions to consider when evaluating if cloud solutions are right for your nonprofit:
+Here are a few key questions to consider when evaluating if cloud solutions are right for your nonprofit:
 1. Do you need remote access to documents for your team?
 2. Are you looking for ways to improve collaboration among staff and volunteers?
 3. Is data security a priority for your organization?
