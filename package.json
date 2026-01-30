@@ -8,7 +8,8 @@
     "functions:dev": "wrangler pages dev _site --functions functions",
     "functions:deploy": "wrangler pages deploy _site --project-name=zephyrsolutions",
     "test:report": "npx tsx scripts/test-report-normalize.ts",
-    "test:notion-update": "npx tsx scripts/test-notion-update.ts"
+    "test:notion-update": "npx tsx scripts/test-notion-update.ts",
+    "linkedin:get-token": "node scripts/get-linkedin-refresh-token.mjs"
   },
   "keywords": [
     "eleventy",

@@ -8,8 +8,7 @@ on:
     paths: ['content/linkedin/**']
 
 permissions:
-  contents: read
-  contents: write  # to commit .published.json
+  contents: write  # read + write (needed to commit .published.json)
 
 jobs:
   publish:

@@ -27,9 +27,17 @@ The workflow passes these as environment variables to the publish script. The sc
 ## LinkedIn app setup
 
 1. **Create an app** in the [LinkedIn Developer Portal](https://www.linkedin.com/developers/apps).
-2. **OAuth 2.0**: Use the Authorization Code flow to get an access token and (if available) a refresh token for the member who will post.
-3. **Scopes**: Request `w_member_social` for posting on behalf of a member. For image uploads, ensure any scope required by the Assets API (e.g. for feed share images) is included per [LinkedIn’s docs](https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/vector-asset-api).
-4. **Tokens**: Store the refresh token (or long-lived access token) in `LINKEDIN_REFRESH_TOKEN`. Access tokens typically last 60 days; refresh when needed via the OAuth refresh endpoint.
+2. **Auth**: In the app’s **Auth** tab, add a **Redirect URL**: `http://localhost:8080/callback`.
+3. **Products**: Under Products, add **Sign In with LinkedIn using OpenID Connect** (or the product that grants `w_member_social`).
+4. **Scopes**: Request `w_member_social` for posting on behalf of a member. For image uploads, ensure any scope required by the Assets API is included per [LinkedIn’s docs](https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/vector-asset-api).
+5. **Get a refresh token** (one-time): Run the helper script so LinkedIn redirects back to your machine and the script prints the refresh token:
+   ```bash
+   export LINKEDIN_CLIENT_ID="your_client_id"
+   export LINKEDIN_CLIENT_SECRET="your_client_secret"
+   npm run linkedin:get-token
+   ```
+   Or: `node scripts/get-linkedin-refresh-token.mjs` with those env vars set. The script opens a browser; you sign in and approve; it prints **LINKEDIN_REFRESH_TOKEN** for you to copy into GitHub Secrets.
+6. **Tokens**: Store the printed refresh token in GitHub Secret `LINKEDIN_REFRESH_TOKEN`. Access tokens typically last 60 days; the workflow uses the refresh token to get new access tokens when needed.
 
 See [Quickstart: LinkedIn Post Automation](../specs/001-linkedin-automation/quickstart.md) for the happy path and [contracts/linkedin-api-usage.md](../specs/001-linkedin-automation/contracts/linkedin-api-usage.md) for the publish flow.
 
