@@ -1,0 +1,65 @@
+# Publish LinkedIn posts on push to main when content/linkedin/** changes.
+# Only *.md files under content/linkedin/ are published; .published.json changes do not republish.
+name: LinkedIn Publish
+
+on:
+  push:
+    branches: [main]
+    paths: ['content/linkedin/**']
+
+permissions:
+  contents: read
+  contents: write  # to commit .published.json
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 2
+
+      - name: List changed LinkedIn post files
+        id: posts
+        run: |
+          # Only consider .md files under content/linkedin/ (exclude .published.json)
+          CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- content/linkedin/ 2>/dev/null || true)
+          POSTS=$(echo "$CHANGED" | grep -E '^content/linkedin/.+\.md$' || true)
+          if [ -z "$POSTS" ]; then
+            echo "posts_json=[]" >> "$GITHUB_OUTPUT"
+            echo "No .md post files changed; nothing to publish."
+            exit 0
+          fi
+          echo "$POSTS" | jq -R -s -c 'split("\n") | map(select(length > 0))' >> "$GITHUB_OUTPUT"
+          echo "Post files to consider:"
+          echo "$POSTS"
+
+      - name: Publish to LinkedIn
+        if: steps.posts.outputs.posts_json != '[]'
+        env:
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          LINKEDIN_REFRESH_TOKEN: ${{ secrets.LINKEDIN_REFRESH_TOKEN }}
+        run: |
+          POSTS_JSON='${{ steps.posts.outputs.posts_json }}'
+          COMMIT_SHA='${{ github.sha }}'
+          bash .github/scripts/linkedin-publish.sh "$POSTS_JSON" "$COMMIT_SHA"
+
+      - name: Commit and push publish state
+        if: steps.posts.outputs.posts_json != '[]' && success()
+        run: |
+          if [ -f content/linkedin/.published.json ] && git diff --quiet content/linkedin/.published.json 2>/dev/null; then
+            echo "No changes to .published.json; skip commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add content/linkedin/.published.json
+            if git diff --staged --quiet; then
+              echo "No staged changes; skip push."
+            else
+              git commit -m "chore(linkedin): update publish state"
+              git push
+            fi
+          fi
