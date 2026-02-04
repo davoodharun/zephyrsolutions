@@ -178,6 +178,9 @@ upload_image() {
   if [ "$code" != "200" ] && [ "$code" != "201" ]; then
     err "Images initializeUpload failed (HTTP $code). LinkedIn response:"
     printf '%s\n' "$body" | jq . 2>/dev/null || printf '%s\n' "$body"
+    if [ "$code" = "401" ]; then
+      err "401 Unauthorized: token may be expired, revoked, or missing scope. For company page: get a new token with LINKEDIN_USE_COMPANY_PAGE=true (includes w_organization_social and rw_ads), then update LINKEDIN_ACCESS_TOKEN in GitHub Secrets."
+    fi
     return 1
   fi
   upload_url=$(echo "$body" | jq -r '.value.uploadUrl')
@@ -250,6 +253,9 @@ create_ugc_post() {
   if [ "$code" != "200" ] && [ "$code" != "201" ]; then
     err "UGC post create failed (HTTP $code)"
     echo "$body" | jq -r '.message // .' 2>/dev/null || echo "$body"
+    if [ "$code" = "401" ]; then
+      err "401 Unauthorized: refresh your token with LINKEDIN_USE_COMPANY_PAGE=true and update LINKEDIN_ACCESS_TOKEN in GitHub Secrets."
+    fi
     return 1
   fi
   echo "Created UGC post (HTTP $code)"
@@ -281,7 +287,7 @@ fi
 AUTHOR_URN=$(get_author_urn "$ACCESS_TOKEN") || exit 1
 if echo "$AUTHOR_URN" | grep -q '^urn:li:organization:'; then
   log "Publishing to company page: $AUTHOR_URN"
-  log "Ensure LINKEDIN_ACCESS_TOKEN was obtained with w_organization_social (run get-token with LINKEDIN_USE_COMPANY_PAGE=true)."
+  log "Ensure LINKEDIN_ACCESS_TOKEN was obtained with w_organization_social and rw_ads (run get-token with LINKEDIN_USE_COMPANY_PAGE=true)."
 else
   log "Publishing to personal profile: $AUTHOR_URN"
   log "To publish to a company page instead, add GitHub Secret LINKEDIN_ORGANIZATION_ID (numeric) or LINKEDIN_ORGANIZATION_URN (urn:li:organization:ID)"

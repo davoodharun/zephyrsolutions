@@ -22,9 +22,9 @@ import { platform } from 'os';
 const PORT = 8080;
 const REDIRECT_URI = `http://localhost:${PORT}/callback`;
 // Base scopes: w_member_social (personal), openid + profile (userinfo/me).
-// w_organization_social is only requested when LINKEDIN_USE_COMPANY_PAGE=true (requires Advertising API product on the app).
+// Company page: w_organization_social (post as org) + rw_ads (Images API for org-owned uploads; required by rest/images).
 const BASE_SCOPE = 'w_member_social openid profile';
-const COMPANY_PAGE_SCOPE = 'w_organization_social';
+const COMPANY_PAGE_SCOPE = 'w_organization_social rw_ads';
 const SCOPE = process.env.LINKEDIN_USE_COMPANY_PAGE === 'true' || process.env.LINKEDIN_USE_COMPANY_PAGE === '1'
   ? `${BASE_SCOPE} ${COMPANY_PAGE_SCOPE}`
   : BASE_SCOPE;

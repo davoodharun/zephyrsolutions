@@ -66,7 +66,7 @@ The workflow uses **Option A** when `LINKEDIN_ACCESS_TOKEN` is set; otherwise it
 6. **Tokens**: Store the printed refresh token in GitHub Secret `LINKEDIN_REFRESH_TOKEN`. Access tokens typically last 60 days; the workflow uses the refresh token to get new access tokens when needed.
 7. **Company page** (optional): To publish to a company page you need both:
    - **Org ID in Secrets**: Set GitHub Secret `LINKEDIN_ORGANIZATION_ID` (numeric) or `LINKEDIN_ORGANIZATION_URN` (e.g. `urn:li:organization:123456`). The signed-in member must have a posting role (ADMINISTRATOR, CONTENT_ADMIN, or DIRECT_SPONSORED_CONTENT_POSTER).
-   - **Token with org scope**: The access token must include `w_organization_social`. Run the get-token script **with** `LINKEDIN_USE_COMPANY_PAGE=true`, then update `LINKEDIN_ACCESS_TOKEN` (or `LINKEDIN_REFRESH_TOKEN`) in GitHub Secrets. If you use an old token that was obtained without that scope, the API returns **400 "Organization permissions must be used when using organization as author"**.
+   - **Token with org scopes**: The access token must include `w_organization_social` and `rw_ads` (Images API for company page). Run the get-token script **with** `LINKEDIN_USE_COMPANY_PAGE=true`, then update `LINKEDIN_ACCESS_TOKEN` (or `LINKEDIN_REFRESH_TOKEN`) in GitHub Secrets. Without these scopes you may get **400 "Organization permissions must be used when using organization as author"** or **401 Unauthorized** on image upload.
 
 See [Quickstart: LinkedIn Post Automation](../specs/001-linkedin-automation/quickstart.md) for the happy path and [contracts/linkedin-api-usage.md](../specs/001-linkedin-automation/contracts/linkedin-api-usage.md) for the publish flow.
 
