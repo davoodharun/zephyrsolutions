@@ -82,15 +82,18 @@ LINKEDIN_REDIRECT_URI="${LINKEDIN_REDIRECT_URI:-http://localhost:8080/callback}"
 trim_token() { echo "$1" | tr -d '\n\r' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'; }
 
 get_access_token() {
-  local refresh_trimmed resp code
+  local refresh_trimmed client_id_trimmed client_secret_trimmed redirect_trimmed resp code
   refresh_trimmed=$(trim_token "$LINKEDIN_REFRESH_TOKEN")
+  client_id_trimmed=$(trim_token "$LINKEDIN_CLIENT_ID")
+  client_secret_trimmed=$(trim_token "$LINKEDIN_CLIENT_SECRET")
+  redirect_trimmed=$(trim_token "$LINKEDIN_REDIRECT_URI")
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_TOKEN_URL" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "grant_type=refresh_token" \
     -d "refresh_token=$refresh_trimmed" \
-    -d "client_id=$LINKEDIN_CLIENT_ID" \
-    -d "client_secret=$LINKEDIN_CLIENT_SECRET" \
-    -d "redirect_uri=$LINKEDIN_REDIRECT_URI") || true
+    -d "client_id=$client_id_trimmed" \
+    -d "client_secret=$client_secret_trimmed" \
+    -d "redirect_uri=$redirect_trimmed") || true
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then
@@ -102,7 +105,11 @@ get_access_token() {
       err "Response body was empty."
     fi
     if [ "$code" = "401" ] || [ "$code" = "400" ]; then
-      err "Common causes: (1) Refresh token expired or revoked — get a new one with LINKEDIN_USE_COMPANY_PAGE=true and update LINKEDIN_REFRESH_TOKEN. (2) redirect_uri must match exactly what was used when the refresh token was obtained (e.g. http://localhost:8080/callback). Set vars.LINKEDIN_REDIRECT_URI in the repo if you used a different URI. (3) Refresh token truncated when pasted — paste the full token with no newlines into the secret."
+      if echo "$body" | grep -q "invalid_client"; then
+        err "invalid_client: Check LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET. Re-copy from LinkedIn Developer Portal (Auth tab). Remove any leading/trailing newlines or spaces when pasting into GitHub Secrets."
+      else
+        err "Common causes: (1) Refresh token expired or revoked — get a new one with LINKEDIN_USE_COMPANY_PAGE=true and update LINKEDIN_REFRESH_TOKEN. (2) redirect_uri must match exactly (e.g. http://localhost:8080/callback). (3) Paste the full refresh token with no newlines."
+      fi
     fi
     return 1
   fi
