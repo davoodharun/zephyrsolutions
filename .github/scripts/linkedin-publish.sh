@@ -78,12 +78,16 @@ resolve_image() {
 # redirect_uri must match the one used when the refresh token was obtained (e.g. from get-linkedin-refresh-token.mjs).
 LINKEDIN_REDIRECT_URI="${LINKEDIN_REDIRECT_URI:-http://localhost:8080/callback}"
 
+# Trim whitespace/newlines from a token (Secrets sometimes get trailing newlines when pasted).
+trim_token() { echo "$1" | tr -d '\n\r' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'; }
+
 get_access_token() {
-  local resp code
+  local refresh_trimmed resp code
+  refresh_trimmed=$(trim_token "$LINKEDIN_REFRESH_TOKEN")
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_TOKEN_URL" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "grant_type=refresh_token" \
-    -d "refresh_token=$LINKEDIN_REFRESH_TOKEN" \
+    -d "refresh_token=$refresh_trimmed" \
     -d "client_id=$LINKEDIN_CLIENT_ID" \
     -d "client_secret=$LINKEDIN_CLIENT_SECRET" \
     -d "redirect_uri=$LINKEDIN_REDIRECT_URI") || true
@@ -278,11 +282,18 @@ post_body_text() {
 }
 
 # --- Main ---
-if [ -n "${LINKEDIN_ACCESS_TOKEN:-}" ]; then
-  ACCESS_TOKEN="$LINKEDIN_ACCESS_TOKEN"
-  log "Using provided LINKEDIN_ACCESS_TOKEN (expires in ~60 days; re-run get-token script to refresh)."
-else
+# Prefer refresh-token flow when refresh token is set (especially for company page: ensures fresh token with w_organization_social + rw_ads).
+# Stored access tokens can be stale, truncated, or have paste newlines; refresh gives a clean token each run.
+if [ -n "${LINKEDIN_REFRESH_TOKEN:-}" ] && [ -n "${LINKEDIN_CLIENT_ID:-}" ] && [ -n "${LINKEDIN_CLIENT_SECRET:-}" ]; then
+  log "Using refresh token to obtain access token (recommended for company page)."
   ACCESS_TOKEN=$(get_access_token) || exit 1
+  ACCESS_TOKEN=$(trim_token "$ACCESS_TOKEN")
+elif [ -n "${LINKEDIN_ACCESS_TOKEN:-}" ]; then
+  ACCESS_TOKEN=$(trim_token "$LINKEDIN_ACCESS_TOKEN")
+  log "Using provided LINKEDIN_ACCESS_TOKEN (expires ~60 days). For company page, prefer refresh token so each run uses a fresh token."
+else
+  err "Set LINKEDIN_REFRESH_TOKEN + LINKEDIN_CLIENT_ID + LINKEDIN_CLIENT_SECRET, or LINKEDIN_ACCESS_TOKEN."
+  exit 1
 fi
 AUTHOR_URN=$(get_author_urn "$ACCESS_TOKEN") || exit 1
 if echo "$AUTHOR_URN" | grep -q '^urn:li:organization:'; then
