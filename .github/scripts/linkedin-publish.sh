@@ -157,16 +157,16 @@ get_author_urn() {
 }
 
 # --- Upload image via Images API (replaces deprecated Assets API); return image URN ---
-# image_owner_urn: URN used as owner for the image asset. For company page posts, use person URN here
-#   (Images API often returns 400 with organization owner); the post author can still be the organization.
+# owner must match post author: for company page use organization URN; for personal use person URN.
+# Token must have w_organization_social when owner is organization (get token with LINKEDIN_USE_COMPANY_PAGE=true).
 upload_image() {
   local token="$1"
-  local image_owner_urn="$2"
+  local owner_urn="$2"
   local image_path="$3"
   local resp code body upload_url image_urn status i
 
   # Initialize upload (Images API)
-  body=$(jq -n --arg owner "$image_owner_urn" '{ initializeUploadRequest: { owner: $owner } }')
+  body=$(jq -n --arg owner "$owner_urn" '{ initializeUploadRequest: { owner: $owner } }')
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/rest/images?action=initializeUpload" \
     -H "Authorization: Bearer $token" \
     -H "Linkedin-Version: $LINKEDIN_VERSION" \
@@ -281,11 +281,9 @@ fi
 AUTHOR_URN=$(get_author_urn "$ACCESS_TOKEN") || exit 1
 if echo "$AUTHOR_URN" | grep -q '^urn:li:organization:'; then
   log "Publishing to company page: $AUTHOR_URN"
-  PERSON_URN=$(get_person_urn "$ACCESS_TOKEN") || exit 1
-  IMAGE_OWNER_URN="$PERSON_URN"
+  log "Ensure LINKEDIN_ACCESS_TOKEN was obtained with w_organization_social (run get-token with LINKEDIN_USE_COMPANY_PAGE=true)."
 else
   log "Publishing to personal profile: $AUTHOR_URN"
-  IMAGE_OWNER_URN="$AUTHOR_URN"
   log "To publish to a company page instead, add GitHub Secret LINKEDIN_ORGANIZATION_ID (numeric) or LINKEDIN_ORGANIZATION_URN (urn:li:organization:ID)"
 fi
 
@@ -313,7 +311,7 @@ while IFS= read -r post_path; do
   fi
   if [ -n "$image_path" ]; then
     log "Publishing with image: $post_path"
-    asset_urn=$(upload_image "$ACCESS_TOKEN" "$IMAGE_OWNER_URN" "$image_path") || { err "Upload failed for $post_path"; exit 1; }
+    asset_urn=$(upload_image "$ACCESS_TOKEN" "$AUTHOR_URN" "$image_path") || { err "Upload failed for $post_path"; exit 1; }
     create_ugc_post "$ACCESS_TOKEN" "$AUTHOR_URN" "$text" "$asset_urn" || { err "Create post failed for $post_path"; exit 1; }
   else
     log "Publishing text-only: $post_path"

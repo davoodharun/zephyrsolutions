@@ -64,7 +64,9 @@ The workflow uses **Option A** when `LINKEDIN_ACCESS_TOKEN` is set; otherwise it
      ```
    Or: `node scripts/get-linkedin-refresh-token.mjs` with those env vars set. The script opens a browser; you sign in and approve; it prints **LINKEDIN_REFRESH_TOKEN** for you to copy into GitHub Secrets.
 6. **Tokens**: Store the printed refresh token in GitHub Secret `LINKEDIN_REFRESH_TOKEN`. Access tokens typically last 60 days; the workflow uses the refresh token to get new access tokens when needed.
-7. **Company page ID** (optional): To publish to a company page, find your organization ID (e.g. from your company page URL or LinkedIn admin) and set GitHub Secret `LINKEDIN_ORGANIZATION_ID` (numeric) or `LINKEDIN_ORGANIZATION_URN` (e.g. `urn:li:organization:123456`). The signed-in member must have a posting role on that page (ADMINISTRATOR, CONTENT_ADMIN, or DIRECT_SPONSORED_CONTENT_POSTER). If you previously obtained a token without the Advertising API, re-run the get-token script so the new token includes `w_organization_social`.
+7. **Company page** (optional): To publish to a company page you need both:
+   - **Org ID in Secrets**: Set GitHub Secret `LINKEDIN_ORGANIZATION_ID` (numeric) or `LINKEDIN_ORGANIZATION_URN` (e.g. `urn:li:organization:123456`). The signed-in member must have a posting role (ADMINISTRATOR, CONTENT_ADMIN, or DIRECT_SPONSORED_CONTENT_POSTER).
+   - **Token with org scope**: The access token must include `w_organization_social`. Run the get-token script **with** `LINKEDIN_USE_COMPANY_PAGE=true`, then update `LINKEDIN_ACCESS_TOKEN` (or `LINKEDIN_REFRESH_TOKEN`) in GitHub Secrets. If you use an old token that was obtained without that scope, the API returns **400 "Organization permissions must be used when using organization as author"**.
 
 See [Quickstart: LinkedIn Post Automation](../specs/001-linkedin-automation/quickstart.md) for the happy path and [contracts/linkedin-api-usage.md](../specs/001-linkedin-automation/contracts/linkedin-api-usage.md) for the publish flow.
 
