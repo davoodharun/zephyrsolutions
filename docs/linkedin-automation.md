@@ -32,22 +32,39 @@ If your app returns a refresh token when you run the get-token script:
 | `LINKEDIN_CLIENT_SECRET` | LinkedIn app Client Secret |
 | `LINKEDIN_REFRESH_TOKEN` | OAuth 2.0 refresh token for the member account that will post |
 
+**Company page (publish to organization instead of personal profile)**  
+To publish to a **company page** instead of your personal profile, add **one** of:
+
+| Secret | Description |
+|--------|-------------|
+| `LINKEDIN_ORGANIZATION_ID` | Numeric LinkedIn organization ID of your company page (e.g. `123456`) |
+| `LINKEDIN_ORGANIZATION_URN` | Full URN (e.g. `urn:li:organization:123456`) |
+
+Your app must have the **Advertising API** product and the member must have a company page role (e.g. ADMINISTRATOR, CONTENT_ADMIN, or DIRECT_SPONSORED_CONTENT_POSTER). When neither is set, posts publish to the **personal profile** of the account that owns the token.
+
 The workflow uses **Option A** when `LINKEDIN_ACCESS_TOKEN` is set; otherwise it uses **Option B**. The script never logs token values (FR-007).
 
 ## LinkedIn app setup
 
 1. **Create an app** in the [LinkedIn Developer Portal](https://www.linkedin.com/developers/apps).
 2. **Auth**: In the app’s **Auth** tab, add a **Redirect URL**: `http://localhost:8080/callback`.
-3. **Products**: Under Products, add **Sign In with LinkedIn using OpenID Connect** (or the product that grants `w_member_social`).
-4. **Scopes**: Request `w_member_social` for posting on behalf of a member. For image uploads, ensure any scope required by the Assets API is included per [LinkedIn’s docs](https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/vector-asset-api).
+3. **Products**: Under Products, add **Sign In with LinkedIn using OpenID Connect** (for personal posting). For **company page** posting, also add **Advertising API** (grants `w_organization_social`).
+4. **Scopes**: The get-token script requests `w_member_social` (personal) and `w_organization_social` (company page). For image uploads, the Images API is used with the same token.
 5. **Get a refresh token** (one-time): Run the helper script so LinkedIn redirects back to your machine and the script prints the refresh token:
-   ```bash
-   export LINKEDIN_CLIENT_ID="your_client_id"
-   export LINKEDIN_CLIENT_SECRET="your_client_secret"
-   npm run linkedin:get-token
-   ```
+   - **Personal profile only** (no company page):
+     ```bash
+     export LINKEDIN_CLIENT_ID="your_client_id"
+     export LINKEDIN_CLIENT_SECRET="your_client_secret"
+     npm run linkedin:get-token
+     ```
+   - **Company page** (requires Advertising API on the app): Request the `w_organization_social` scope by setting `LINKEDIN_USE_COMPANY_PAGE=true`. If your app does not yet have that scope in the Auth tab, you will get an **invalid_scope** error—add the Advertising API product and ensure the scope is assigned, then try again.
+     ```bash
+     export LINKEDIN_USE_COMPANY_PAGE=true
+     npm run linkedin:get-token
+     ```
    Or: `node scripts/get-linkedin-refresh-token.mjs` with those env vars set. The script opens a browser; you sign in and approve; it prints **LINKEDIN_REFRESH_TOKEN** for you to copy into GitHub Secrets.
 6. **Tokens**: Store the printed refresh token in GitHub Secret `LINKEDIN_REFRESH_TOKEN`. Access tokens typically last 60 days; the workflow uses the refresh token to get new access tokens when needed.
+7. **Company page ID** (optional): To publish to a company page, find your organization ID (e.g. from your company page URL or LinkedIn admin) and set GitHub Secret `LINKEDIN_ORGANIZATION_ID` (numeric) or `LINKEDIN_ORGANIZATION_URN` (e.g. `urn:li:organization:123456`). The signed-in member must have a posting role on that page (ADMINISTRATOR, CONTENT_ADMIN, or DIRECT_SPONSORED_CONTENT_POSTER). If you previously obtained a token without the Advertising API, re-run the get-token script so the new token includes `w_organization_social`.
 
 See [Quickstart: LinkedIn Post Automation](../specs/001-linkedin-automation/quickstart.md) for the happy path and [contracts/linkedin-api-usage.md](../specs/001-linkedin-automation/contracts/linkedin-api-usage.md) for the publish flow.
 

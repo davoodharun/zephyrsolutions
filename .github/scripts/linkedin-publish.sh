@@ -2,7 +2,9 @@
 # Publish LinkedIn posts from content/linkedin/*.md to LinkedIn (Images API + Posts API).
 # Usage: linkedin-publish.sh <posts_json_array> <commit_sha>
 # Example: linkedin-publish.sh '["content/linkedin/2026-01-29-slug-educational.md"]' abc123
+# Target: company page if LINKEDIN_ORGANIZATION_ID or LINKEDIN_ORGANIZATION_URN is set; otherwise personal profile.
 # Requires: either LINKEDIN_ACCESS_TOKEN (use directly) or LINKEDIN_CLIENT_ID + LINKEDIN_CLIENT_SECRET + LINKEDIN_REFRESH_TOKEN (exchange for token).
+# Company page: app needs Advertising API (w_organization_social). Set LINKEDIN_ORGANIZATION_ID (numeric) or LINKEDIN_ORGANIZATION_URN (urn:li:organization:123).
 # On auth or API failure exits non-zero; does not log tokens (FR-007).
 
 set -euo pipefail
@@ -100,7 +102,7 @@ get_access_token() {
   echo "$body" | jq -r '.access_token'
 }
 
-# --- Get person URN (author) ---
+# --- Get person URN (author for personal profile) ---
 # Try OpenID Connect userinfo first (works with openid+profile scope); fall back to /v2/me.
 get_person_urn() {
   local token="$1"
@@ -129,15 +131,41 @@ get_person_urn() {
   return 1
 }
 
+# --- Resolve author URN: company page (organization) or personal profile ---
+# If LINKEDIN_ORGANIZATION_ID or LINKEDIN_ORGANIZATION_URN is set, use organization (company page).
+# Otherwise use person URN (personal profile). Requires w_organization_social for company page.
+get_author_urn() {
+  local token="$1"
+  if [ -n "${LINKEDIN_ORGANIZATION_URN:-}" ]; then
+    # Expect format urn:li:organization:123
+    if echo "$LINKEDIN_ORGANIZATION_URN" | grep -qE '^urn:li:organization:[0-9]+$'; then
+      echo "$LINKEDIN_ORGANIZATION_URN"
+      return
+    fi
+    err "LINKEDIN_ORGANIZATION_URN must be like urn:li:organization:123"
+    return 1
+  fi
+  if [ -n "${LINKEDIN_ORGANIZATION_ID:-}" ]; then
+    if echo "$LINKEDIN_ORGANIZATION_ID" | grep -qE '^[0-9]+$'; then
+      echo "urn:li:organization:$LINKEDIN_ORGANIZATION_ID"
+      return
+    fi
+    err "LINKEDIN_ORGANIZATION_ID must be a numeric organization ID"
+    return 1
+  fi
+  get_person_urn "$token"
+}
+
 # --- Upload image via Images API (replaces deprecated Assets API); return image URN ---
+# owner can be person URN (personal) or organization URN (company page).
 upload_image() {
   local token="$1"
-  local person_urn="$2"
+  local author_urn="$2"
   local image_path="$3"
   local resp code body upload_url image_urn status i
 
   # Initialize upload (Images API)
-  body=$(jq -n --arg owner "$person_urn" '{ initializeUploadRequest: { owner: $owner } }')
+  body=$(jq -n --arg owner "$author_urn" '{ initializeUploadRequest: { owner: $owner } }')
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_API_BASE/rest/images?action=initializeUpload" \
     -H "Authorization: Bearer $token" \
     -H "Linkedin-Version: $LINKEDIN_VERSION" \
@@ -175,16 +203,16 @@ upload_image() {
   echo "$image_urn"
 }
 
-# --- Create post via rest/posts (Posts API; supports person author + image URN) ---
+# --- Create post via rest/posts (Posts API; supports person or organization author + image URN) ---
 create_ugc_post() {
   local token="$1"
-  local person_urn="$2"
+  local author_urn="$2"
   local text="$3"
   local image_urn="${4:-}"  # optional; urn:li:image:xxx from Images API
   local payload
   if [ -n "$image_urn" ]; then
     payload=$(jq -n \
-      --arg author "$person_urn" \
+      --arg author "$author_urn" \
       --arg text "$text" \
       --arg media "$image_urn" \
       '{
@@ -198,7 +226,7 @@ create_ugc_post() {
       }')
   else
     payload=$(jq -n \
-      --arg author "$person_urn" \
+      --arg author "$author_urn" \
       --arg text "$text" \
       '{
         author: $author,
@@ -249,8 +277,13 @@ if [ -n "${LINKEDIN_ACCESS_TOKEN:-}" ]; then
 else
   ACCESS_TOKEN=$(get_access_token) || exit 1
 fi
-PERSON_URN=$(get_person_urn "$ACCESS_TOKEN") || exit 1
-log "Publishing as $PERSON_URN"
+AUTHOR_URN=$(get_author_urn "$ACCESS_TOKEN") || exit 1
+if echo "$AUTHOR_URN" | grep -q '^urn:li:organization:'; then
+  log "Publishing to company page: $AUTHOR_URN"
+else
+  log "Publishing to personal profile: $AUTHOR_URN"
+  log "To publish to a company page instead, add GitHub Secret LINKEDIN_ORGANIZATION_ID (numeric) or LINKEDIN_ORGANIZATION_URN (urn:li:organization:ID)"
+fi
 
 STATE=$(jq -c . "$STATE_FILE")
 POSTS=$(echo "$POSTS_JSON" | jq -c '.[]')
@@ -276,11 +309,11 @@ while IFS= read -r post_path; do
   fi
   if [ -n "$image_path" ]; then
     log "Publishing with image: $post_path"
-    asset_urn=$(upload_image "$ACCESS_TOKEN" "$PERSON_URN" "$image_path") || { err "Upload failed for $post_path"; exit 1; }
-    create_ugc_post "$ACCESS_TOKEN" "$PERSON_URN" "$text" "$asset_urn" || { err "Create post failed for $post_path"; exit 1; }
+    asset_urn=$(upload_image "$ACCESS_TOKEN" "$AUTHOR_URN" "$image_path") || { err "Upload failed for $post_path"; exit 1; }
+    create_ugc_post "$ACCESS_TOKEN" "$AUTHOR_URN" "$text" "$asset_urn" || { err "Create post failed for $post_path"; exit 1; }
   else
     log "Publishing text-only: $post_path"
-    create_ugc_post "$ACCESS_TOKEN" "$PERSON_URN" "$text" "" || { err "Create post failed for $post_path"; exit 1; }
+    create_ugc_post "$ACCESS_TOKEN" "$AUTHOR_URN" "$text" "" || { err "Create post failed for $post_path"; exit 1; }
   fi
   # Append to state (per contracts/publish-state.md)
   STATE=$(echo "$STATE" | jq -c \

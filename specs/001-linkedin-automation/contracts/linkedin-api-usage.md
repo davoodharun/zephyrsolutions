@@ -4,25 +4,26 @@
 
 ## Authentication
 
-- **Method**: OAuth 2.0; member token (post on behalf of a person).
+- **Method**: OAuth 2.0; member token (post on behalf of a person or organization).
 - **Secrets** (stored in GitHub Secrets, not in repo):
   - `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET` (LinkedIn app credentials).
   - `LINKEDIN_REFRESH_TOKEN` (or long-lived access token) for the member account that will post.
-- **Scopes**: `w_member_social`; plus any scope required for Assets API (image upload) per LinkedIn docs.
+  - **Company page** (optional): `LINKEDIN_ORGANIZATION_ID` (numeric) or `LINKEDIN_ORGANIZATION_URN` (`urn:li:organization:{id}`). When set, posts publish to the organization; otherwise to the member’s personal profile.
+- **Scopes**: `w_member_social` (personal); `w_organization_social` (company page; requires Advertising API product). Images API used for image upload with same token.
 
 ## Flow (per post)
 
-1. **Resolve image**: From post file path/frontmatter, derive date and slug; look for image at `public/images/content-flywheel/YYYY-MM-DD-<slug>-social.png` (fallback: hero, then inline). If none, publish without image (FR-006).
-2. **Obtain access token**: Use refresh token to get a valid access token (if using refresh flow).
-3. **Upload image** (when image present): Use LinkedIn Assets API — register upload (recipe `urn:li:digitalmediaRecipe:feedshare-image`), upload image binary (JPEG/PNG), obtain asset URN.
-4. **Create UGC post**: POST to UGC Post API with:
-   - `author`: person URN
+1. **Resolve author**: If `LINKEDIN_ORGANIZATION_ID` or `LINKEDIN_ORGANIZATION_URN` is set, use organization URN as author; else get person URN from userinfo/me.
+2. **Resolve image**: From post file path/frontmatter, derive date and slug; look for image at `public/images/content-flywheel/YYYY-MM-DD-<slug>-social.png` (fallback: hero, then inline). If none, publish without image (FR-006).
+3. **Obtain access token**: Use refresh token to get a valid access token (if using refresh flow).
+4. **Upload image** (when image present): Use LinkedIn Images API — initializeUpload with author as owner, upload image binary (PNG), obtain image URN.
+5. **Create post**: POST to rest/posts (Posts API) with:
+   - `author`: person URN or organization URN
    - `lifecycleState`: `PUBLISHED`
-   - `visibility`: `PUBLIC` or `CONNECTIONS` (configurable)
-   - `specificContent.shareCommentary`: post text (from markdown body, stripped/sanitized)
-   - `specificContent.shareMediaCategory`: `IMAGE` when image present
-   - `specificContent.media`: array with uploaded asset reference when image present
-5. **Record success**: Update publish state (e.g. mark post file as published at this commit) so re-runs skip.
+   - `visibility`: `PUBLIC`
+   - `commentary`: post text (from markdown body, stripped/sanitized)
+   - `content.media`: when image present, image URN from Images API
+6. **Record success**: Update publish state (e.g. mark post file as published at this commit) so re-runs skip.
 
 ## Error handling
 

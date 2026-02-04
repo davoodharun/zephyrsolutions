@@ -5,10 +5,12 @@
  * Prerequisites:
  * 1. Create an app at https://www.linkedin.com/developers/apps
  * 2. In the app: Auth tab → add Redirect URL: http://localhost:8080/callback
- * 3. Under Products, add "Sign In with LinkedIn using OpenID Connect" (or the product that grants w_member_social)
+ * 3. Under Products, add "Sign In with LinkedIn using OpenID Connect"; for company page add "Advertising API" too.
  * 4. Set env: LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET
+ * 5. For company page token, set LINKEDIN_USE_COMPANY_PAGE=true (requires Advertising API on the app; otherwise you get invalid_scope).
  *
  * Run: node scripts/get-linkedin-refresh-token.mjs
+ *      LINKEDIN_USE_COMPANY_PAGE=true node scripts/get-linkedin-refresh-token.mjs   # for company page
  * Then open the URL shown (or the script will try to open it), sign in with LinkedIn, approve.
  * The script will print refresh_token and access_token; put refresh_token in GitHub Secret LINKEDIN_REFRESH_TOKEN.
  */
@@ -19,7 +21,13 @@ import { platform } from 'os';
 
 const PORT = 8080;
 const REDIRECT_URI = `http://localhost:${PORT}/callback`;
-const SCOPE = 'w_member_social openid profile';
+// Base scopes: w_member_social (personal), openid + profile (userinfo/me).
+// w_organization_social is only requested when LINKEDIN_USE_COMPANY_PAGE=true (requires Advertising API product on the app).
+const BASE_SCOPE = 'w_member_social openid profile';
+const COMPANY_PAGE_SCOPE = 'w_organization_social';
+const SCOPE = process.env.LINKEDIN_USE_COMPANY_PAGE === 'true' || process.env.LINKEDIN_USE_COMPANY_PAGE === '1'
+  ? `${BASE_SCOPE} ${COMPANY_PAGE_SCOPE}`
+  : BASE_SCOPE;
 const AUTH_URL = 'https://www.linkedin.com/oauth/v2/authorization';
 const TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken';
 
@@ -110,6 +118,10 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log('Local callback server listening on', REDIRECT_URI);
+  console.log('Requested scopes:', SCOPE);
+  if (SCOPE.includes(COMPANY_PAGE_SCOPE)) {
+    console.log('(Company page: w_organization_social — ensure Advertising API is on your app or you may get invalid_scope)');
+  }
   console.log('Opening browser for LinkedIn sign-in...');
   openBrowser(authUrl);
   console.log('If the browser did not open, visit:\n', authUrl);

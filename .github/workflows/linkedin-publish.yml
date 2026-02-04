@@ -1,4 +1,4 @@
-# Publish LinkedIn posts. Trigger disabled for now (publishing will use company page when access is ready).
+# Publish LinkedIn posts to a company page (or personal profile if no org ID set).
 # Run manually via Actions → LinkedIn Publish → Run workflow.
 name: LinkedIn Publish
 
@@ -62,6 +62,9 @@ jobs:
           LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
           LINKEDIN_REFRESH_TOKEN: ${{ secrets.LINKEDIN_REFRESH_TOKEN }}
           LINKEDIN_REDIRECT_URI: ${{ vars.LINKEDIN_REDIRECT_URI || 'http://localhost:8080/callback' }}
+          # Company page: set one of these so posts publish to the org instead of personal profile.
+          LINKEDIN_ORGANIZATION_ID: ${{ secrets.LINKEDIN_ORGANIZATION_ID }}
+          LINKEDIN_ORGANIZATION_URN: ${{ secrets.LINKEDIN_ORGANIZATION_URN }}
         run: |
           POSTS_JSON='${{ steps.posts.outputs.posts_json }}'
           COMMIT_SHA='${{ github.sha }}'
