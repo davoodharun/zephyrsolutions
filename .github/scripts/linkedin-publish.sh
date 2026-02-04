@@ -94,12 +94,15 @@ get_access_token() {
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then
-    err "LinkedIn auth failed (HTTP $code). Response body length: ${#body} bytes."
-    if [ -z "$body" ]; then
-      err "Response body was empty. Check client_id, client_secret, refresh_token, and redirect_uri."
+    err "LinkedIn token exchange failed (HTTP $code)."
+    if [ -n "$body" ]; then
+      err "Response body: $body"
+      echo "$body" | jq . 2>/dev/null || true
     else
-      err "LinkedIn token API response:"
-      printf '%s\n' "$body" | jq . 2>/dev/null || printf '%s\n' "$body"
+      err "Response body was empty."
+    fi
+    if [ "$code" = "401" ] || [ "$code" = "400" ]; then
+      err "Common causes: (1) Refresh token expired or revoked — get a new one with LINKEDIN_USE_COMPANY_PAGE=true and update LINKEDIN_REFRESH_TOKEN. (2) redirect_uri must match exactly what was used when the refresh token was obtained (e.g. http://localhost:8080/callback). Set vars.LINKEDIN_REDIRECT_URI in the repo if you used a different URI. (3) Refresh token truncated when pasted — paste the full token with no newlines into the secret."
     fi
     return 1
   fi
