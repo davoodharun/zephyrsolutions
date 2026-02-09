@@ -87,13 +87,14 @@ get_access_token() {
   client_id_trimmed=$(trim_token "$LINKEDIN_CLIENT_ID")
   client_secret_trimmed=$(trim_token "$LINKEDIN_CLIENT_SECRET")
   redirect_trimmed=$(trim_token "$LINKEDIN_REDIRECT_URI")
+  # Use --data-urlencode so client_id/client_secret with special chars (&, =, +) are sent correctly.
   resp=$(curl -s -w "\n%{http_code}" -X POST "$LINKEDIN_TOKEN_URL" \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=refresh_token" \
-    -d "refresh_token=$refresh_trimmed" \
-    -d "client_id=$client_id_trimmed" \
-    -d "client_secret=$client_secret_trimmed" \
-    -d "redirect_uri=$redirect_trimmed") || true
+    --data-urlencode "grant_type=refresh_token" \
+    --data-urlencode "refresh_token=$refresh_trimmed" \
+    --data-urlencode "client_id=$client_id_trimmed" \
+    --data-urlencode "client_secret=$client_secret_trimmed" \
+    --data-urlencode "redirect_uri=$redirect_trimmed") || true
   code=$(echo "$resp" | tail -n1)
   body=$(echo "$resp" | sed '$d')
   if [ "$code" != "200" ]; then
@@ -106,7 +107,7 @@ get_access_token() {
     fi
     if [ "$code" = "401" ] || [ "$code" = "400" ]; then
       if echo "$body" | grep -q "invalid_client"; then
-        err "invalid_client: Check LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET. Re-copy from LinkedIn Developer Portal (Auth tab). Remove any leading/trailing newlines or spaces when pasting into GitHub Secrets."
+        err "invalid_client: Check LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET. Re-copy from LinkedIn Developer Portal (Auth tab). If the secret contains special characters, try regenerating the Client secret in the Auth tab and updating the GitHub secret with the new value."
       else
         err "Common causes: (1) Refresh token expired or revoked — get a new one with LINKEDIN_USE_COMPANY_PAGE=true and update LINKEDIN_REFRESH_TOKEN. (2) redirect_uri must match exactly (e.g. http://localhost:8080/callback). (3) Paste the full refresh token with no newlines."
       fi
